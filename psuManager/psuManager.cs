@@ -14,14 +14,6 @@
         public string getNominalWatt();
         public string getSerialNumber();
 
-        public string getManufacture();
-
-        public string getSoftVersion();
-
-        public string getDeviceType();
-
-        public string getArticleNumber();
-
         public void setVoltage(int setVolt);
 
         public int remoteOnOf();
@@ -38,21 +30,7 @@
 
     internal class PSU3000 : IPSU
     {
-        public string getArticleNumber()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string getDeviceType()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string getManufacture()
-        {
-            throw new NotImplementedException();
-        }
-
+       
         public string getNominalVolt()
         {
             throw new NotImplementedException();
@@ -68,11 +46,7 @@
             throw new NotImplementedException();
         }
 
-        public string getSoftVersion()
-        {
-            throw new NotImplementedException();
-        }
-
+   
         public int remoteOnOf()
         {
             throw new NotImplementedException();
@@ -92,7 +66,7 @@
         //INTERNAL FUNCTION
         public static string getCom()
         {
-            string com = "Com7";
+            string com = "Com6";
             return com;
         }
 
@@ -426,209 +400,6 @@
                 return serialNumberString;
             }
         }
-
-        public string getManufacture()
-        {
-            string com = getCom();
-            // reading serial number
-            List<byte> Serialresponse;
-            int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
-            byte SD = Convert.ToByte(SDHex.ToString(), 10);
-            // Remember the dataframe setup, SD, DN,   OBJ, DATA checksum1, checksum2
-            // OBJ = 0x01 = 1
-            byte[] serialBytesToSend = { 0x7F, 0x00, 0x08, 0x00, 0x87 };
-            using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
-            {
-                Thread.Sleep(500);
-                port.Open();
-                // write to the USB port
-                port.Write(serialBytesToSend, 0, serialBytesToSend.Length);
-                Thread.Sleep(500);
-
-                Serialresponse = new List<byte>();
-                int length = port.BytesToRead;
-                if (length > 0)
-                {
-                    byte[] message = new byte[length];
-                    port.Read(message, 0, length);
-                    foreach (var t in message)
-                    {
-                        //Console.WriteLine(t);
-                        Serialresponse.Add(t);
-                    }
-                }
-                port.Close();
-                Thread.Sleep(500);
-
-                string binary = Convert.ToString(Serialresponse[0], 2);
-                string payloadLengtBinaryString = binary.Substring(4);
-                int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
-
-                string manufact = "";
-
-                for (var i = 0; i < payloadLength; i++)
-                {
-                    manufact += Convert.ToChar(Serialresponse[3 + i]);
-                }
-
-                return manufact;
-            }
-        }
-
-        public string getSoftVersion()
-        {
-            string com = getCom();
-            // reading serial number
-            List<byte> Serialresponse;
-            int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
-            byte SD = Convert.ToByte(SDHex.ToString(), 10);
-            // Remember the dataframe setup, SD, DN,   OBJ, DATA checksum1, checksum2
-            // OBJ = 0x01 = 1
-            byte[] serialBytesToSend = { 0x7F, 0x00, 0x09, 0x00, 0x88 };
-
-            using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
-            {
-                Thread.Sleep(500);
-                port.Open();
-                // write to the USB port
-                port.Write(serialBytesToSend, 0, serialBytesToSend.Length);
-                Thread.Sleep(500);
-
-                Serialresponse = new List<byte>();
-                int length = port.BytesToRead;
-                if (length > 0)
-                {
-                    byte[] message = new byte[length];
-                    port.Read(message, 0, length);
-                    foreach (var t in message)
-                    {
-                        //Console.WriteLine(t);
-                        Serialresponse.Add(t);
-                    }
-                }
-                port.Close();
-                Thread.Sleep(500);
-
-                string binary = Convert.ToString(Serialresponse[0], 2);
-                string payloadLengtBinaryString = binary.Substring(4);
-                int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
-
-                string softVersion = "";
-
-
-                for (var i = 0; i < payloadLength; i++)
-                {
-                    softVersion += Convert.ToChar(Serialresponse[3 + i]);
-                }
-
-                return softVersion;
-            }
-        }
-
-        public string getDeviceType()
-        {
-            string com = getCom();
-            // reading serial number
-            List<byte> Serialresponse;
-            int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
-            byte SD = Convert.ToByte(SDHex.ToString(), 10);
-            // Remember the dataframe setup, SD, DN,   OBJ, DATA checksum1, checksum2
-            // OBJ = 0x01 = 1
-            byte[] serialBytesToSend = { 0x7F, 0x00, 0x00, 0x00, 0x7F };
-
-            using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
-            {
-                Thread.Sleep(500);
-                port.Open();
-                // write to the USB port
-                port.Write(serialBytesToSend, 0, serialBytesToSend.Length);
-                Thread.Sleep(500);
-
-                Serialresponse = new List<byte>();
-                int length = port.BytesToRead;
-                if (length > 0)
-                {
-                    byte[] message = new byte[length];
-                    port.Read(message, 0, length);
-                    foreach (var t in message)
-                    {
-                        //Console.WriteLine(t);
-                        Serialresponse.Add(t);
-                    }
-                }
-                port.Close();
-                Thread.Sleep(500);
-
-                string binary = Convert.ToString(Serialresponse[0], 2);
-                string payloadLengtBinaryString = binary.Substring(4);
-                int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
-
-                string manufact = "";
-
-
-                for (var i = 0; i < payloadLength; i++)
-                {
-                    manufact += Convert.ToChar(Serialresponse[3 + i]);
-                }
-
-                return manufact;
-            }
-        }
-
-
-        public string getArticleNumber()
-        {
-            string com = getCom();
-            // reading serial number
-            List<byte> Serialresponse;
-            int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
-            byte SD = Convert.ToByte(SDHex.ToString(), 10);
-            // Remember the dataframe setup, SD, DN,   OBJ, DATA checksum1, checksum2
-            // OBJ = 0x01 = 1
-            byte[] serialBytesToSend = { 0x7F, 0x00, 0x06, 0x00, 0x85 };
-
-            using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
-            {
-                Thread.Sleep(500);
-                port.Open();
-                // write to the USB port
-                port.Write(serialBytesToSend, 0, serialBytesToSend.Length);
-                Thread.Sleep(500);
-
-                Serialresponse = new List<byte>();
-                int length = port.BytesToRead;
-                if (length > 0)
-                {
-                    byte[] message = new byte[length];
-                    port.Read(message, 0, length);
-                    foreach (var t in message)
-                    {
-                        //Console.WriteLine(t);
-                        Serialresponse.Add(t);
-                    }
-                }
-                port.Close();
-                Thread.Sleep(500);
-
-                string binary = Convert.ToString(Serialresponse[0], 2);
-                string payloadLengtBinaryString = binary.Substring(4);
-                int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
-
-                string artNum = "";
-
-
-                for (var i = 0; i < payloadLength; i++)
-                {
-                    artNum += Convert.ToChar(Serialresponse[3 + i]);
-                }
-
-                return artNum;
-            }
-        }
-
-
-
-
 
 
 

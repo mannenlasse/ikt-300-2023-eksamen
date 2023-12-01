@@ -24,10 +24,15 @@ namespace ikt300_frivilig_prosjekt
             displayWatt();
             start_displayOutput();
             displaySerialNumber();
-            displayManufacture();
-            displaySoftVersion();
-            getDeviceType();
-            getArticleNumber();
+        }
+
+        private void DisplayPsuInfo()
+        {
+            // Use psu object to display information in the UI
+            textBox13.Text = psu.getNominalVolt();
+            textBox17.Text = psu.getNominalWatt();
+            textBox5.Text = psu.getSerialNumber();
+            // ... other UI updates
         }
 
 
@@ -57,23 +62,7 @@ namespace ikt300_frivilig_prosjekt
 
 
 
-        public void getDeviceType()
-        {
-            //TaxAdded
-            textBox7.Text = psu.getDeviceType();
 
-        }
-        public void displayManufacture()
-        {
-            //TaxAdded
-            textBox8.Text = psu.getManufacture();
-        }
-
-        public void getArticleNumber()
-        {
-            //TaxAdded
-            textBox6.Text = psu.getArticleNumber();
-        }
 
         public void displaySerialNumber()
         {
@@ -82,11 +71,8 @@ namespace ikt300_frivilig_prosjekt
         }
 
 
-        public void displaySoftVersion()
-        {
-            //TaxAdded
-            textBox11.Text = psu.getSoftVersion();
-        }
+
+
 
 
 
@@ -183,10 +169,15 @@ namespace ikt300_frivilig_prosjekt
             psu.setVoltage(int.Parse(textBox18.Text));
 
             displayVolt();
-                
+
         }
 
         private void textBox18_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
         {
 
         }
