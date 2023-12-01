@@ -1,4 +1,5 @@
 ﻿using System.IO.Ports;
+using System.Text.Json;
 
 namespace PsuManager;
 
@@ -88,10 +89,23 @@ internal class Psu3000 : IPsu
 public class Psu2000 : IPsu
 {
     //INTERNAL FUNCTION
-    public static string GetCom()
+    public static string? GetCom()
     {
-        string com = "Com4";
-        return com;
+        // Read the entire JSON file content as a string
+        string jsonString = File.ReadAllText(@"./PsuManager/comport.json");
+
+        // Use JsonDocument to parse the JSON string
+        using (var document = JsonDocument.Parse(jsonString))
+        {
+            // Access the root object
+            var root = document.RootElement;
+
+            // Access the value of the "comport" property
+            var comportElement = root.GetProperty("comport");
+
+            // Convert the JsonElement to a C# string
+            return comportElement.GetString();
+        }
     }
 
     public string GetVolt()
