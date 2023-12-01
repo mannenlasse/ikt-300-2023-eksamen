@@ -97,61 +97,54 @@ public class Psu2000 : IPsu
         }
     }
 
-
-    public string GetVolt()
+    public string GetVoltage()
     {
-        string com = GetComport();
-        int percentVolt = 0;
-
-        // Get voltage
-
+        /* ----- First, we read the "wrong" voltage ----- */
+        var com = GetComport();
+        
         //SD = MessageType + CastType + Direction + Length
-        int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
-        byte SD = Convert.ToByte(SDHex.ToString(), 10);
-
-        System.Diagnostics.Debug.WriteLine("SD:" + SD);
-
+        var sdHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
+        var sd = Convert.ToByte(sdHex.ToString(), 10);
+        
         //SD, DN, OBJ, DATA, CS
-        byte[] byteWithOutCheckSum = { SD, (int)0x00, (int)0x47, 0x0, 0x0 }; // quert status
+        byte[] byteWithOutCheckSum = { sd, (int)0x00, (int)0x47, 0x0, 0x0 }; // quert status
 
-        int sum = 0;
-        int arrayLength = byteWithOutCheckSum.Length;
-        for (int i = 0; i < arrayLength; i++)
+        var sum = 0;
+        var arrayLength = byteWithOutCheckSum.Length;
+        for (var i = 0; i < arrayLength; i++)
         {
             sum += byteWithOutCheckSum[i];
         }
 
-        string hexSum = sum.ToString("X");
-        string cs1 = "";
-        string cs2 = "";
-        if (hexSum.Length == 4)
+        var hexSum = sum.ToString("X");
+        var cs1 = "";
+        var cs2 = "";
+        switch (hexSum.Length)
         {
-            cs1 = hexSum.Substring(0, hexSum.Length / 2);
-            cs2 = hexSum.Substring(hexSum.Length / 2);
-        }
-        else if (hexSum.Length == 3)
-        {
-            cs1 = hexSum.Substring(0, 1);
-            cs2 = hexSum.Substring(1);
-        }
-        else if ((hexSum.Length is 2) || (hexSum.Length is 1))
-        {
-            cs1 = "0";
-            cs2 = hexSum;
+            case 4:
+                cs1 = hexSum.Substring(0, hexSum.Length / 2);
+                cs2 = hexSum.Substring(hexSum.Length / 2);
+                break;
+            case 3:
+                cs1 = hexSum.Substring(0, 1);
+                cs2 = hexSum.Substring(1);
+                break;
+            case 2:
+            case 1:
+                cs1 = "0";
+                cs2 = hexSum;
+                break;
         }
 
         if (cs1 != "")
         {
-
-
             byteWithOutCheckSum[arrayLength - 2] = Convert.ToByte(cs1, 16);
             byteWithOutCheckSum[arrayLength - 1] = Convert.ToByte(cs2, 16);
         }
 
         // now the byte array is ready to be sent
-
         List<byte> responseTelegram;
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -160,7 +153,7 @@ public class Psu2000 : IPsu
             Thread.Sleep(500);
 
             responseTelegram = new List<byte>();
-            int length = port.BytesToRead;
+            var length = port.BytesToRead;
             if (length > 0)
             {
                 byte[] message = new byte[length];
@@ -174,63 +167,17 @@ public class Psu2000 : IPsu
             port.Close();
             Thread.Sleep(500);
         }
+        
+        var percentVoltString = responseTelegram[5].ToString("X") + responseTelegram[6].ToString("X");
+        var percentVoltInt = Convert.ToInt32(percentVoltString, 16);
+        var percentVolt = Convert.ToDouble(percentVoltInt.ToString("0.00"));
 
-        if (responseTelegram == null)
-        {
-            string error = "No telegram was read";
-            return error;
-        }
-        else
-        {
-            string percentVoltString = responseTelegram[5].ToString("X") + responseTelegram[6].ToString("X");
-            percentVolt = Convert.ToInt32(percentVoltString, 16);
-            return percentVolt.ToString("0.00");
-        }
-    }
-
-    public string GetVoltage()
-    {
-        string com = GetComport();
-        float nominalVoltage = 0;
-        double volt;
-        //  Get Nominal Voltage
-        List<byte> response;
-        byte[] bytesToSend = { 0x74, 0x00, 0x02, 0x00, 0x76 };
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
-
-
-        {
-            Thread.Sleep(500);
-            port.Open();
-            port.Write(bytesToSend, 0, bytesToSend.Length);
-            Thread.Sleep(50);
-            response = new List<byte>();
-            int length = port.BytesToRead;
-            if (length > 0)
-            {
-                byte[] message = new byte[length];
-                port.Read(message, 0, length);
-                foreach (var t in message)
-                {
-                    response.Add(t);
-                }
-            }
-            port.Close();
-            Thread.Sleep(500);
-        }
-        if (response == null)
-        {
-            Console.WriteLine("No telegram was read");
-            return "Not found";
-        }
-        else
-        {
-            byte[] byteArray = { response[6], response[5], response[4], response[3] };
-            nominalVoltage = BitConverter.ToSingle(byteArray, 0);
-            double percentVolt = Convert.ToDouble(GetVolt());
-            volt = (double)percentVolt * nominalVoltage / 25600;
-            return volt.ToString("0.00");
-        }
+        /* ----- Then we get the nominal voltage ----- */
+        var nominalVoltage = GetNominalVoltage();
+        
+        /* ----- Lastly, we convert to the actual voltage ----- */
+        var volt = (double)percentVolt * nominalVoltage / 25600;
+        return volt.ToString("0.00");
     }
 
     public string GetCurrent()
@@ -313,6 +260,37 @@ public class Psu2000 : IPsu
 
         // Convert the JsonElement to a C# string
         return comportElement.GetString();
+    }
+    
+    private double GetNominalVoltage()
+    {
+        var com = GetComport();
+        
+        List<byte> response;
+        byte[] bytesToSend = { 0x74, 0x00, 0x02, 0x00, 0x76 };
+        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSend, 0, bytesToSend.Length);
+            Thread.Sleep(50);
+            response = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    response.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+        }
+
+        byte[] byteArray = { response[6], response[5], response[4], response[3] };
+        return BitConverter.ToSingle(byteArray, 0);
     }
 }
 

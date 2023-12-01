@@ -8,7 +8,7 @@ public partial class Form1 : Form
 {
     private IPsu _psu;
 
-    private ComboBox comboBoxPsuTypes;
+    private ComboBox _comboBoxPsuTypes;
 
     public Form1()
     {
@@ -30,30 +30,30 @@ public partial class Form1 : Form
     // Initialize the ComboBox with PSU types
     private void InitializeComboBox()
     {
-        comboBoxPsuTypes = new ComboBox();
-        comboBoxPsuTypes.Location = new System.Drawing.Point(12, 12); // Set appropriate location
-        comboBoxPsuTypes.DropDownStyle = ComboBoxStyle.DropDownList;
+        _comboBoxPsuTypes = new ComboBox();
+        _comboBoxPsuTypes.Location = new System.Drawing.Point(12, 12); // Set appropriate location
+        _comboBoxPsuTypes.DropDownStyle = ComboBoxStyle.DropDownList;
         PopulatePsuTypes();
-        Controls.Add(comboBoxPsuTypes);
+        Controls.Add(_comboBoxPsuTypes);
     }
 
     // Populate the ComboBox with PSU types
     private void PopulatePsuTypes()
     {
-        comboBoxPsuTypes.Items.AddRange(Enum.GetValues(typeof(PsuType)).Cast<object>().ToArray());
-        comboBoxPsuTypes.SelectedIndex = 0; // Set the default selection
+        _comboBoxPsuTypes.Items.AddRange(Enum.GetValues(typeof(PsuType)).Cast<object>().ToArray());
+        _comboBoxPsuTypes.SelectedIndex = 0; // Set the default selection
     }
 
     // Subscribe to ComboBox and other events
     private void SubscribeToEvents()
     {
-        comboBoxPsuTypes.SelectedIndexChanged += comboBoxPsuTypes_SelectedIndexChanged;
+        _comboBoxPsuTypes.SelectedIndexChanged += _comboBoxPsuTypes_SelectedIndexChanged;
     }
 
     // Event handler for ComboBox selection change
-    private void comboBoxPsuTypes_SelectedIndexChanged(object sender, EventArgs e)
+    private void _comboBoxPsuTypes_SelectedIndexChanged(object sender, EventArgs e)
     {
-        var selectedPsuType = (PsuType)comboBoxPsuTypes.SelectedItem;
+        var selectedPsuType = (PsuType)_comboBoxPsuTypes.SelectedItem;
         _psu = PsuFactory.CreatePsu(selectedPsuType);
         DisplayPsuInfo();
     }
@@ -63,6 +63,7 @@ public partial class Form1 : Form
     {
         textBox13.Text = _psu.GetVoltage();
         textBox5.Text = _psu.GetVoltage();
+        textBox5.Text = _psu.GetSerialNumber();
     }
 
     // User-defined method to display voltage
