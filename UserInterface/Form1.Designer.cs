@@ -1,5 +1,5 @@
 ﻿
-namespace ikt300_frivilig_prosjekt
+namespace UserInterface
 {
     public partial class Form1
     {
