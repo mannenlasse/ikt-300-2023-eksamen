@@ -90,7 +90,7 @@ public class Psu2000 : IPsu
     //INTERNAL FUNCTION
     public static string GetCom()
     {
-        string com = "Com7";
+        string com = "Com4";
         return com;
     }
 

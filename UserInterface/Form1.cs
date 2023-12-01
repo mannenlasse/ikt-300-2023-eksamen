@@ -7,7 +7,7 @@ namespace UserInterface;
 public partial class Form1 : Form
 {
     private IPsu _psu;
-    
+
     private ComboBox comboBoxPsuTypes;
 
     public Form1()
