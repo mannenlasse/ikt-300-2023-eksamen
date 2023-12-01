@@ -225,7 +225,87 @@ public class Psu2000 : IPsu
 
     public string GetCurrent()
     {
-        throw new NotImplementedException();
+        /* ----- First, we read the "wrong" current ----- */
+        var com = GetComport();
+        
+        //SD = MessageType + CastType + Direction + Length
+        var sdHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
+        var sd = Convert.ToByte(sdHex.ToString(), 10);
+        
+        //SD, DN, OBJ, DATA, CS
+        byte[] byteWithOutCheckSum = { sd, (int)0x00, (int)0x47, 0x0, 0x0 }; // quert status
+
+        var sum = 0;
+        var arrayLength = byteWithOutCheckSum.Length;
+        for (var i = 0; i < arrayLength; i++)
+        {
+            sum += byteWithOutCheckSum[i];
+        }
+
+        var hexSum = sum.ToString("X");
+        var cs1 = "";
+        var cs2 = "";
+        switch (hexSum.Length)
+        {
+            case 4:
+                cs1 = hexSum.Substring(0, hexSum.Length / 2);
+                cs2 = hexSum.Substring(hexSum.Length / 2);
+                break;
+            case 3:
+                cs1 = hexSum.Substring(0, 1);
+                cs2 = hexSum.Substring(1);
+                break;
+            case 2:
+            case 1:
+                cs1 = "0";
+                cs2 = hexSum;
+                break;
+        }
+
+        if (cs1 != "")
+        {
+            byteWithOutCheckSum[arrayLength - 2] = Convert.ToByte(cs1, 16);
+            byteWithOutCheckSum[arrayLength - 1] = Convert.ToByte(cs2, 16);
+        }
+
+        // now the byte array is ready to be sent
+        List<byte> responseTelegram;
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            // write to the USB port
+            port.Write(byteWithOutCheckSum, 0, byteWithOutCheckSum.Length);
+            Thread.Sleep(500);
+
+            responseTelegram = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    //Console.WriteLine(t);
+                    responseTelegram.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+        }
+        
+        Console.WriteLine(responseTelegram.Count);
+        
+        var percentCurrentString = responseTelegram[7].ToString("X") + responseTelegram[8].ToString("X");
+        var percentCurrentInt = Convert.ToInt32(percentCurrentString, 16);
+        var percentCurrent = Convert.ToDouble(percentCurrentInt.ToString("0.00"));
+
+        /* ----- Then we get the nominal current ----- */
+        var nominalCurrent = GetNominalCurrent();
+        
+        /* ----- Lastly, we convert to the actual current ----- */
+        var volt = (double)percentCurrent * nominalCurrent / 25600;
+        return volt.ToString("0.00");
     }
 
     public void StopOperation()
@@ -241,7 +321,6 @@ public class Psu2000 : IPsu
     // Custom methods
     public string GetSerialNumber()
     {
-        Console.WriteLine("Nominal current: " + GetNominalCurrent());
         var com = GetComport();
         // reading serial number
         List<byte> serialresponse;

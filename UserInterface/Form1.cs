@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Windows.Forms;
 using PsuManager;
 
@@ -61,21 +62,31 @@ public partial class Form1 : Form
     // User-defined method to display PSU information
     private void DisplayPsuInfo()
     {
-        textBox13.Text = _psu.GetVoltage();
-        textBox5.Text = _psu.GetVoltage();
+        var currentVoltage = _psu.GetVoltage() + "V";
+        var currentCurrent = _psu.GetVoltage() + "A";
+
+        textBox13.Text = currentVoltage;
+        textBox17.Text = currentCurrent;
         textBox5.Text = _psu.GetSerialNumber();
     }
 
     // User-defined method to display voltage
-    public void DisplayVolt()
+    public void DisplayVoltageAndCurrent()
     {
-        textBox13.Text = _psu.GetVoltage();
+        var currentVoltage = _psu.GetVoltage() + "V";
+        var currentCurrent = _psu.GetVoltage() + "A";
+
+        textBox13.Text = currentVoltage;
+        textBox17.Text = currentCurrent;
     }
 
     // User-defined method to start displaying output
     public void StartDisplayOutput()
     {
-        richTextBox2.Text = @"Current volt(v): " + _psu.GetVoltage();
+        var currentVoltage = "Current voltage: " + _psu.GetVoltage() + "V";
+        var currentCurrent = "Current current: " + _psu.GetCurrent() + "A";
+        
+        richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
 
     // ... Other UI event handlers and methods ...
@@ -83,15 +94,19 @@ public partial class Form1 : Form
     // Example event handler for a button click
     private void button2_Click(object sender, EventArgs e)
     {
-        DisplayVolt();
+        DisplayVoltageAndCurrent();
         StartDisplayOutput();
     }
 
     // Example event handler for another button click
     private void button4_Click_1(object sender, EventArgs e)
     {
-        _psu.SetVoltage(float.Parse(textBox14.Text));
-        DisplayVolt();
+        // This code allows for "." instead of ","
+        var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+        ci.NumberFormat.CurrencyDecimalSeparator = ".";
+        
+        _psu.SetVoltage(float.Parse(textBox14.Text, NumberStyles.Any, ci));
+        DisplayVoltageAndCurrent();
     }
 
     private void button6_Click(object sender, EventArgs e)

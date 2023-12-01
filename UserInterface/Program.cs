@@ -16,6 +16,6 @@ public class Program
 
     private void ProgramStart(Form1 form)
     {
-        form.DisplayVolt();
+        
     }
 }
