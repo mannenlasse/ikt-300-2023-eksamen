@@ -44,43 +44,107 @@ public class Psu2000 : IPsu
     {
         var com = GetComport();
 
-        // Calculate the percentage of Unom * 256
-        var percentVoltage = (int)setVolt; // Assuming voltage is a floating-point value
-
-        // Construct the command to set the voltage
-        int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5;
-        byte SD = Convert.ToByte(SDHex.ToString(), 10);
-
-        // SD, DN, OBJ, DATA (set value command)
-        byte[] byteWithOutCheckSum = { SD, (int)0x01, (int)0x50, (byte)(percentVoltage & 0xFF), (byte)((percentVoltage >> 8) & 0xFF) };
         
-        //SD = MessageType + CastType + Direction + Length
-        //int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
-        //byte SD = Convert.ToByte(SDHex.ToString(), 10);
+        
+        byte[] bytesToSendToTurnOnRC = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn on remote control
+        List<byte> RCresponse;
+        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSendToTurnOnRC, 0, bytesToSendToTurnOnRC.Length);
+            Thread.Sleep(50);
+            RCresponse = new List<byte>();
+            int length = port.BytesToRead;
+            if (length > 0)
+            {
+                byte[] message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    RCresponse.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+            if (RCresponse[3] ==0)
+            {
+                Console.WriteLine("Remote Control is turned on");
+            }
+            else
+            {
+                Console.WriteLine(String.Format("Remote control is not turned on due to error: {0}", RCresponse[3].ToString()));
+            }
+        }
+       
+        // 
+        int percentSetValue = (int)Math.Round((25600 * setVolt) / 84);
 
-        //SD, DN, OBJ, DATA, CS
-        //byte[] byteWithOutCheckSum = { SD, (int)0x00, (int)0x47, 0x0, 0x0 }; // quert status
+        string hexValue = percentSetValue.ToString("X");
+        string hexValue1 = "";
+        string hexValue2 = "";
 
-        // Calculate checksum and update the command
-        int sum = byteWithOutCheckSum.Sum(b => (int)b);
-        string hexSum = sum.ToString("X");
-        string cs1 = hexSum.Substring(0, 2);
-        string cs2 = hexSum.Substring(2);
+        if (hexValue.Length == 4)
+        {
+            hexValue1 = hexValue.Substring(0, hexValue.Length / 2);
+            hexValue2 = hexValue.Substring(hexValue.Length / 2);
+        }
+        else if (hexValue.Length == 3)
+        {
+            hexValue1 = hexValue.Substring(0, 1);
+            hexValue2 = hexValue.Substring(1);
+        }
+        else if ((hexValue.Length is 2) || (hexValue.Length is 1))
+        {
+            hexValue1 = "0";
+            hexValue2 = hexValue;
+        }
+        byte[] newbytesWithoutChecksum = { 0xF2, 0x00, 0x32, Convert.ToByte(hexValue1, 16), Convert.ToByte(hexValue2, 16), 0x0, 0x0 };
 
-        byteWithOutCheckSum[byteWithOutCheckSum.Length-2] = Convert.ToByte(cs1, 16);
-        byteWithOutCheckSum[byteWithOutCheckSum.Length-1] = Convert.ToByte(cs2, 16);
+        int newsum = 0;
+        int newarrayLength = newbytesWithoutChecksum.Length;
+        for (int i = 0; i < newarrayLength; i++)
+        {
+            newsum += newbytesWithoutChecksum[i];
+        }
+
+        string newhexSum = newsum.ToString("X");
+        string newcs1 = "";
+        string newcs2 = "";
+        if (newhexSum.Length == 4)
+        {
+            newcs1 = newhexSum.Substring(0, newhexSum.Length / 2);
+            newcs2 = newhexSum.Substring(newhexSum.Length / 2);
+        }
+        else if (newhexSum.Length == 3)
+        {
+            newcs1 = newhexSum.Substring(0, 1);
+            newcs2 = newhexSum.Substring(1);
+        }
+        else if ((newhexSum.Length is 2) || (newhexSum.Length is 1))
+        {
+            newcs1 = "0";
+            newcs2 = newhexSum;
+        }
+
+        if (newcs1 != "")
+        {
 
 
-        List<byte> responseTelegram;
+            newbytesWithoutChecksum[newarrayLength - 2] = Convert.ToByte(newcs1, 16);
+            newbytesWithoutChecksum[newarrayLength - 1] = Convert.ToByte(newcs2, 16);
+        }
+
+        List<byte> newResponseTelegram;
         using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
             // write to the USB port
-            port.Write(byteWithOutCheckSum, 0, byteWithOutCheckSum.Length);
+            port.Write(newbytesWithoutChecksum, 0, newbytesWithoutChecksum.Length);
             Thread.Sleep(500);
 
-            responseTelegram = new List<byte>();
+            newResponseTelegram = new List<byte>();
             int length = port.BytesToRead;
             if (length > 0)
             {
@@ -89,11 +153,19 @@ public class Psu2000 : IPsu
                 foreach (var t in message)
                 {
                     //Console.WriteLine(t);
-                    responseTelegram.Add(t);
+                    newResponseTelegram.Add(t);
                 }
             }
             port.Close();
             Thread.Sleep(500);
+        }
+        if (newResponseTelegram[3] == 0)
+        {
+            Console.WriteLine("New voltage was set");
+        }
+        else
+        {
+            Console.WriteLine(newResponseTelegram[3].ToString());
         }
     }
 

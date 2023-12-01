@@ -90,7 +90,7 @@ public partial class Form1 : Form
     // Example event handler for another button click
     private void button4_Click_1(object sender, EventArgs e)
     {
-        _psu.SetVoltage(int.Parse(textBox14.Text));
+        _psu.SetVoltage(float.Parse(textBox14.Text));
         DisplayVolt();
     }
 }
