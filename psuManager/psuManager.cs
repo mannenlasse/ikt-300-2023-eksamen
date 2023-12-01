@@ -96,10 +96,11 @@ public class Psu2000 : IPsu
             Thread.Sleep(500);
         }
     }
-    
-    public string GetVoltage()
+
+
+    public string GetVolt()
     {
-        var com = GetComport();
+        string com = GetComport();
         int percentVolt = 0;
 
         // Get voltage
@@ -107,6 +108,8 @@ public class Psu2000 : IPsu
         //SD = MessageType + CastType + Direction + Length
         int SDHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
         byte SD = Convert.ToByte(SDHex.ToString(), 10);
+
+        System.Diagnostics.Debug.WriteLine("SD:" + SD);
 
         //SD, DN, OBJ, DATA, CS
         byte[] byteWithOutCheckSum = { SD, (int)0x00, (int)0x47, 0x0, 0x0 }; // quert status
@@ -182,6 +185,51 @@ public class Psu2000 : IPsu
             string percentVoltString = responseTelegram[5].ToString("X") + responseTelegram[6].ToString("X");
             percentVolt = Convert.ToInt32(percentVoltString, 16);
             return percentVolt.ToString("0.00");
+        }
+    }
+
+    public string GetVoltage()
+    {
+        string com = GetComport();
+        float nominalVoltage = 0;
+        double volt;
+        //  Get Nominal Voltage
+        List<byte> response;
+        byte[] bytesToSend = { 0x74, 0x00, 0x02, 0x00, 0x76 };
+        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+
+
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSend, 0, bytesToSend.Length);
+            Thread.Sleep(50);
+            response = new List<byte>();
+            int length = port.BytesToRead;
+            if (length > 0)
+            {
+                byte[] message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    response.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+        }
+        if (response == null)
+        {
+            Console.WriteLine("No telegram was read");
+            return "Not found";
+        }
+        else
+        {
+            byte[] byteArray = { response[6], response[5], response[4], response[3] };
+            nominalVoltage = BitConverter.ToSingle(byteArray, 0);
+            double percentVolt = Convert.ToDouble(GetVolt());
+            volt = (double)percentVolt * nominalVoltage / 25600;
+            return volt.ToString("0.00");
         }
     }
 
