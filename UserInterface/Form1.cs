@@ -61,22 +61,20 @@ public partial class Form1 : Form
     // User-defined method to display PSU information
     private void DisplayPsuInfo()
     {
-        textBox13.Text = _psu.GetNominalVolt();
-        textBox17.Text = _psu.GetNominalWatt();
-        textBox5.Text = _psu.GetNominalVolt();
-        // ... other UI updates
+        textBox13.Text = _psu.GetVoltage();
+        textBox5.Text = _psu.GetVoltage();
     }
 
     // User-defined method to display voltage
     public void DisplayVolt()
     {
-        textBox14.Text = _psu.GetNominalVolt();
+        textBox14.Text = _psu.GetVoltage();
     }
 
     // User-defined method to start displaying output
     public void StartDisplayOutput()
     {
-        richTextBox2.Text = $"Current volt(v): {_psu.GetNominalVolt()}\nCurrent current(w): {_psu.GetNominalWatt()}\n";
+        richTextBox2.Text = $"Current volt(v): {_psu.GetVoltage()}";
     }
 
     // ... Other UI event handlers and methods ...
@@ -93,19 +91,5 @@ public partial class Form1 : Form
     {
         _psu.SetVoltage(int.Parse(textBox14.Text));
         DisplayVolt();
-    }
-
-    // ... Other UI event handlers and methods ...
-
-    private void button3_Click(object sender, EventArgs e)
-    {
-        if (_psu.RemoteOnOf() == 0)
-        {
-            richTextBox2.Text = "Remote on";
-        }
-        else
-        {
-            richTextBox2.Text = "Remote off";
-        }
     }
 }

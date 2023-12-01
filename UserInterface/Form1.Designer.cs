@@ -149,16 +149,6 @@ namespace UserInterface
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
-            // button3
-            // 
-            button3.Location = new Point(407, 176);
-            button3.Name = "button3";
-            button3.Size = new Size(175, 56);
-            button3.TabIndex = 29;
-            button3.Text = "Unlock / lock";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
-            // 
             // splitter1
             // 
             splitter1.Location = new Point(0, 0);
