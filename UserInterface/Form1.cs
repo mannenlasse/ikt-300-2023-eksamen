@@ -93,4 +93,9 @@ public partial class Form1 : Form
         _psu.SetVoltage(float.Parse(textBox14.Text));
         DisplayVolt();
     }
+
+    private void button6_Click(object sender, EventArgs e)
+    {
+        //on_off button
+    }
 }

@@ -59,109 +59,131 @@ namespace UserInterface
             button5 = new Button();
             comboBox1 = new ComboBox();
             textBox1 = new TextBox();
+            button6 = new Button();
             SuspendLayout();
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(0, 301);
+            textBox4.Location = new Point(0, 401);
+            textBox4.Margin = new Padding(3, 4, 3, 4);
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(100, 23);
+            textBox4.Size = new Size(114, 27);
             textBox4.TabIndex = 6;
             textBox4.Text = "Serial Number";
             // 
             // textBox5
             // 
-            textBox5.Location = new Point(94, 301);
+            textBox5.Location = new Point(107, 401);
+            textBox5.Margin = new Padding(3, 4, 3, 4);
             textBox5.Name = "textBox5";
-            textBox5.Size = new Size(240, 23);
+            textBox5.Size = new Size(274, 27);
             textBox5.TabIndex = 8;
             // 
             // richTextBox2
             // 
-            richTextBox2.Location = new Point(407, 12);
+            richTextBox2.Location = new Point(465, 16);
+            richTextBox2.Margin = new Padding(3, 4, 3, 4);
             richTextBox2.Name = "richTextBox2";
-            richTextBox2.Size = new Size(346, 158);
+            richTextBox2.Size = new Size(395, 209);
             richTextBox2.TabIndex = 18;
             richTextBox2.Text = "";
             // 
             // button1
             // 
-            button1.Location = new Point(405, 243);
+            button1.Location = new Point(463, 324);
+            button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
-            button1.Size = new Size(346, 81);
+            button1.Size = new Size(395, 108);
             button1.TabIndex = 19;
             button1.Text = "Power On/Off";
             button1.UseVisualStyleBackColor = true;
             // 
             // textBox9
             // 
-            textBox9.Location = new Point(5, 75);
+            textBox9.Location = new Point(6, 100);
+            textBox9.Margin = new Padding(3, 4, 3, 4);
             textBox9.Name = "textBox9";
-            textBox9.Size = new Size(103, 23);
+            textBox9.Size = new Size(117, 27);
             textBox9.TabIndex = 20;
             textBox9.Text = "Get current";
             textBox9.TextAlign = HorizontalAlignment.Center;
             // 
             // textBox10
             // 
-            textBox10.Location = new Point(5, 52);
+            textBox10.Location = new Point(6, 69);
+            textBox10.Margin = new Padding(3, 4, 3, 4);
             textBox10.Name = "textBox10";
-            textBox10.Size = new Size(103, 23);
+            textBox10.Size = new Size(117, 27);
             textBox10.TabIndex = 21;
             textBox10.Text = "Get voltage";
             textBox10.TextAlign = HorizontalAlignment.Center;
             // 
             // textBox13
             // 
-            textBox13.Location = new Point(108, 52);
+            textBox13.Location = new Point(123, 69);
+            textBox13.Margin = new Padding(3, 4, 3, 4);
             textBox13.Name = "textBox13";
-            textBox13.Size = new Size(178, 23);
+            textBox13.Size = new Size(203, 27);
             textBox13.TabIndex = 22;
             // 
             // textBox14
             // 
-            textBox14.Location = new Point(108, 124);
+            textBox14.Location = new Point(123, 165);
+            textBox14.Margin = new Padding(3, 4, 3, 4);
             textBox14.Name = "textBox14";
-            textBox14.Size = new Size(178, 23);
+            textBox14.Size = new Size(203, 27);
             textBox14.TabIndex = 23;
             // 
             // textBox17
             // 
-            textBox17.Location = new Point(108, 75);
+            textBox17.Location = new Point(123, 100);
+            textBox17.Margin = new Padding(3, 4, 3, 4);
             textBox17.Name = "textBox17";
-            textBox17.Size = new Size(178, 23);
+            textBox17.Size = new Size(203, 27);
             textBox17.TabIndex = 26;
             // 
             // textBox18
             // 
-            textBox18.Location = new Point(108, 150);
+            textBox18.Location = new Point(123, 200);
+            textBox18.Margin = new Padding(3, 4, 3, 4);
             textBox18.Name = "textBox18";
-            textBox18.Size = new Size(178, 23);
+            textBox18.Size = new Size(203, 27);
             textBox18.TabIndex = 27;
             // 
             // button2
             // 
-            button2.Location = new Point(585, 176);
+            button2.Location = new Point(669, 235);
+            button2.Margin = new Padding(3, 4, 3, 4);
             button2.Name = "button2";
-            button2.Size = new Size(166, 56);
+            button2.Size = new Size(190, 75);
             button2.TabIndex = 28;
             button2.Text = "Refresh";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // button3
+            // 
+            button3.Location = new Point(0, 0);
+            button3.Margin = new Padding(3, 4, 3, 4);
+            button3.Name = "button3";
+            button3.Size = new Size(86, 31);
+            button3.TabIndex = 36;
+            // 
             // splitter1
             // 
             splitter1.Location = new Point(0, 0);
+            splitter1.Margin = new Padding(3, 4, 3, 4);
             splitter1.Name = "splitter1";
-            splitter1.Size = new Size(3, 326);
+            splitter1.Size = new Size(3, 435);
             splitter1.TabIndex = 30;
             splitter1.TabStop = false;
             // 
             // button4
             // 
-            button4.Location = new Point(7, 124);
+            button4.Location = new Point(8, 165);
+            button4.Margin = new Padding(3, 4, 3, 4);
             button4.Name = "button4";
-            button4.Size = new Size(98, 23);
+            button4.Size = new Size(112, 31);
             button4.TabIndex = 31;
             button4.Text = "Set voltage";
             button4.UseVisualStyleBackColor = true;
@@ -169,9 +191,10 @@ namespace UserInterface
             // 
             // button5
             // 
-            button5.Location = new Point(7, 150);
+            button5.Location = new Point(8, 200);
+            button5.Margin = new Padding(3, 4, 3, 4);
             button5.Name = "button5";
-            button5.Size = new Size(98, 23);
+            button5.Size = new Size(112, 31);
             button5.TabIndex = 33;
             button5.Text = "Set X";
             button5.UseVisualStyleBackColor = true;
@@ -179,26 +202,38 @@ namespace UserInterface
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(108, 0);
+            comboBox1.Location = new Point(123, 0);
             comboBox1.Margin = new Padding(1);
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(196, 23);
+            comboBox1.Size = new Size(223, 28);
             comboBox1.TabIndex = 34;
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(5, 0);
+            textBox1.Location = new Point(6, 0);
+            textBox1.Margin = new Padding(3, 4, 3, 4);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(103, 23);
+            textBox1.Size = new Size(117, 27);
             textBox1.TabIndex = 35;
             textBox1.Text = "Select PSU";
             textBox1.TextAlign = HorizontalAlignment.Center;
             // 
+            // button6
+            // 
+            button6.Location = new Point(29, 281);
+            button6.Name = "button6";
+            button6.Size = new Size(94, 29);
+            button6.TabIndex = 37;
+            button6.Text = "on_off";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(765, 326);
+            ClientSize = new Size(874, 435);
+            Controls.Add(button6);
             Controls.Add(textBox1);
             Controls.Add(comboBox1);
             Controls.Add(button5);
@@ -216,6 +251,7 @@ namespace UserInterface
             Controls.Add(richTextBox2);
             Controls.Add(textBox5);
             Controls.Add(textBox4);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "Form1";
             Text = "PSU Controller";
             ResumeLayout(false);
@@ -240,5 +276,6 @@ namespace UserInterface
         private Button button5;
         private ComboBox comboBox1;
         private TextBox textBox1;
+        private Button button6;
     }
 }
