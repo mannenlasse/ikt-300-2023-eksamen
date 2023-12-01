@@ -69,13 +69,13 @@ public partial class Form1 : Form
     // User-defined method to display voltage
     public void DisplayVolt()
     {
-        textBox14.Text = _psu.GetVoltage();
+        textBox13.Text = _psu.GetVoltage();
     }
 
     // User-defined method to start displaying output
     public void StartDisplayOutput()
     {
-        richTextBox2.Text = $"Current volt(v): {_psu.GetVoltage()}";
+        richTextBox2.Text = @"Current volt(v): " + _psu.GetVoltage();
     }
 
     // ... Other UI event handlers and methods ...
