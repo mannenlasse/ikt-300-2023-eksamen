@@ -76,7 +76,7 @@ public partial class Form1 : Form
     // User-defined method to start displaying output
     public void StartDisplayOutput()
     {
-        richTextBox2.Text = $"Current Nominal Volt: {_psu.GetNominalVolt()}\nCurrent Nominal Watt: {_psu.GetNominalWatt()}\n";
+        richTextBox2.Text = $"Current volt(v): {_psu.GetNominalVolt()}\nCurrent current(w): {_psu.GetNominalWatt()}\n";
     }
 
     // ... Other UI event handlers and methods ...
