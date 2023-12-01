@@ -40,44 +40,15 @@ public interface IPsu
 
 public class Psu2000 : IPsu
 {
+    public Psu2000()
+    {
+        ActivateRemoteControl();
+    }
+    
     public void SetVoltage(float setVolt)
     {
         var com = GetComport();
-
         
-        
-        byte[] bytesToSendToTurnOnRC = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn on remote control
-        List<byte> RCresponse;
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
-        {
-            Thread.Sleep(500);
-            port.Open();
-            port.Write(bytesToSendToTurnOnRC, 0, bytesToSendToTurnOnRC.Length);
-            Thread.Sleep(50);
-            RCresponse = new List<byte>();
-            int length = port.BytesToRead;
-            if (length > 0)
-            {
-                byte[] message = new byte[length];
-                port.Read(message, 0, length);
-                foreach (var t in message)
-                {
-                    RCresponse.Add(t);
-                }
-            }
-            port.Close();
-            Thread.Sleep(500);
-            if (RCresponse[3] ==0)
-            {
-                Console.WriteLine("Remote Control is turned on");
-            }
-            else
-            {
-                Console.WriteLine(String.Format("Remote control is not turned on due to error: {0}", RCresponse[3].ToString()));
-            }
-        }
-       
-        // 
         int percentSetValue = (int)Math.Round((25600 * setVolt) / 84);
 
         string hexValue = percentSetValue.ToString("X");
@@ -325,6 +296,7 @@ public class Psu2000 : IPsu
 
         // Use JsonDocument to parse the JSON string
         var document = JsonDocument.Parse(jsonString);
+        
         // Access the root object
         var root = document.RootElement;
 
@@ -395,6 +367,41 @@ public class Psu2000 : IPsu
 
         byte[] byteArray = { response[6], response[5], response[4], response[3] };
         return BitConverter.ToSingle(byteArray, 0);
+    }
+    
+    private void ActivateRemoteControl()
+    {
+        var com = GetComport();
+        
+        var bytesToSendToTurnOnRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn on remote control
+        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSendToTurnOnRc, 0, bytesToSendToTurnOnRc.Length);
+            Thread.Sleep(50);
+            var rcResponse = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    rcResponse.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+            if (rcResponse[3] ==0)
+            {
+                Console.WriteLine("Remote Control is turned on");
+            }
+            else
+            {
+                Console.WriteLine($"Remote control is not turned on due to error: {rcResponse[3].ToString()}");
+            }
+        }
     }
 }
 
