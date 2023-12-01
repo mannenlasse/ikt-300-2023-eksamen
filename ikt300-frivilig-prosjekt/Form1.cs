@@ -1,5 +1,6 @@
 using psuManager;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using PSUFactory;
 
@@ -7,139 +8,98 @@ namespace ikt300_frivilig_prosjekt
 {
     public partial class Form1 : Form
     {
+        private PsuFactory psuFactory = new PsuFactory();
+        private IPSU psu;
 
-        private psuFactory factory = new psuFactory();
-        private IPSU psu = new PSU();
+        private ComboBox comboBoxPsuTypes;
 
+        // Constructor
         public Form1()
         {
-            IPSU psu = factory.CreatePSU("PSU3000");
             InitializeComponent();
-            onStartUp();
+            InitializePowerSupply();
+            InitializeComboBox();
+            DisplayPsuInfo();
+            SubscribeToEvents();
         }
 
-        public void onStartUp()
+        // Initialize the power supply
+        private void InitializePowerSupply()
         {
-            displayVolt();
-            displayWatt();
-            start_displayOutput();
-            displaySerialNumber();
+            // Create an instance of PSU using the factory
+            PsuType defaultPsuType = PsuType.PSU3000; // Set your default PSU type
+            psu = psuFactory.CreatePSU(defaultPsuType);
         }
 
+        // Initialize the ComboBox with PSU types
+        private void InitializeComboBox()
+        {
+            comboBoxPsuTypes = new ComboBox();
+            comboBoxPsuTypes.Location = new System.Drawing.Point(12, 12); // Set appropriate location
+            comboBoxPsuTypes.DropDownStyle = ComboBoxStyle.DropDownList;
+            PopulatePsuTypes();
+            Controls.Add(comboBoxPsuTypes);
+        }
+
+        // Populate the ComboBox with PSU types
+        private void PopulatePsuTypes()
+        {
+            comboBoxPsuTypes.Items.AddRange(Enum.GetValues(typeof(PsuType)).Cast<object>().ToArray());
+            comboBoxPsuTypes.SelectedIndex = 0; // Set the default selection
+        }
+
+        // Subscribe to ComboBox and other events
+        private void SubscribeToEvents()
+        {
+            comboBoxPsuTypes.SelectedIndexChanged += comboBoxPsuTypes_SelectedIndexChanged;
+        }
+
+        // Event handler for ComboBox selection change
+        private void comboBoxPsuTypes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PsuType selectedPsuType = (PsuType)comboBoxPsuTypes.SelectedItem;
+            psu = psuFactory.CreatePSU(selectedPsuType);
+            DisplayPsuInfo();
+        }
+
+        // User-defined method to display PSU information
         private void DisplayPsuInfo()
         {
-            // Use psu object to display information in the UI
             textBox13.Text = psu.getNominalVolt();
             textBox17.Text = psu.getNominalWatt();
             textBox5.Text = psu.getSerialNumber();
             // ... other UI updates
         }
 
-
-
-        //USER DEFINED FUNCTIONS
-        public void displayVolt()
+        // User-defined method to display voltage
+        public void DisplayVolt()
         {
-            //TaxAdded
             textBox14.Text = psu.getNominalVolt();
         }
 
-
-        public void displayWatt()
+        // User-defined method to start displaying output
+        public void StartDisplayOutput()
         {
-            //TaxAdded
-            textBox13.Text = psu.getNominalWatt();
+            richTextBox2.Text = $"Current Nominal Volt: {psu.getNominalVolt()}\nCurrent Nominal Watt: {psu.getNominalWatt()}\n";
         }
 
-        public void start_displayOutput()
-        {
-            //TaxAdded
-            richTextBox2.Text = "Current Nominal Volt: " + psu.getNominalVolt() + "\n" + "Current Nominal Watt: " + psu.getNominalWatt()
-               + "\n";
+        // ... Other UI event handlers and methods ...
 
-
-        }
-
-
-
-
-
-        public void displaySerialNumber()
-        {
-            //TaxAdded
-            textBox5.Text = psu.getSerialNumber();
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        ///////////////////
-
-
-        private void textBox15_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void richTextBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        // Example event handler for a button click
         private void button2_Click(object sender, EventArgs e)
         {
-            displayVolt();
-            start_displayOutput();
+            DisplayVolt();
+            StartDisplayOutput();
         }
 
-        private void textBox13_TextChanged(object sender, EventArgs e)
+        // Example event handler for another button click
+        private void button4_Click_1(object sender, EventArgs e)
         {
-
+            psu.setVoltage(int.Parse(textBox14.Text));
+            DisplayVolt();
         }
 
-        private void textBox14_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox5_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox8_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox7_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox11_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox6_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+        // ... Other UI event handlers and methods ...
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -149,37 +109,8 @@ namespace ikt300_frivilig_prosjekt
             }
             else
             {
-                richTextBox2.Text = "Remote of";
-
+                richTextBox2.Text = "Remote off";
             }
-        }
-
-
-
-
-        private void textBox10_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
-        private void button4_Click_1(object sender, EventArgs e)
-        {
-
-            psu.setVoltage(int.Parse(textBox18.Text));
-
-            displayVolt();
-
-        }
-
-        private void textBox18_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

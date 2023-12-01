@@ -16,7 +16,7 @@ namespace ikt300_frivilig_prosjekt
 
         public void programStart(Form1 form)
         {
-            form.displayVolt();
+            form.DisplayVolt();
         }
     }
 }

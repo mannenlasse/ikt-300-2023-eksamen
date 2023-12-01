@@ -157,10 +157,10 @@ namespace ikt300_frivilig_prosjekt
             // 
             // button2
             // 
-            button2.Location = new Point(361, 575);
+            button2.Location = new Point(1420, 482);
             button2.Margin = new Padding(7, 8, 7, 8);
             button2.Name = "button2";
-            button2.Size = new Size(327, 153);
+            button2.Size = new Size(403, 153);
             button2.TabIndex = 28;
             button2.Text = "Refresh";
             button2.UseVisualStyleBackColor = true;
@@ -168,10 +168,10 @@ namespace ikt300_frivilig_prosjekt
             // 
             // button3
             // 
-            button3.Location = new Point(16, 575);
+            button3.Location = new Point(988, 482);
             button3.Margin = new Padding(7, 8, 7, 8);
             button3.Name = "button3";
-            button3.Size = new Size(331, 153);
+            button3.Size = new Size(426, 153);
             button3.TabIndex = 29;
             button3.Text = "Unlock / lock";
             button3.UseVisualStyleBackColor = true;

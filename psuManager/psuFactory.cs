@@ -7,17 +7,34 @@ using System.Threading.Tasks;
 using psuManager;
 namespace PSUFactory
 {
-    public class psuFactory
+    public enum PsuType
     {
-        public IPSU CreatePSU(string psuType)
+        PSU3000
+        // Add more PSU types here if needed
+    }
+
+    public class PsuFactory
+    {
+        public IPSU CreatePSU(PsuType psuType)
         {
             switch (psuType)
             {
-                case "PSU3000":
+                case PsuType.PSU3000:
                     return new PSU3000();
+                // Add cases for other PSU types here
                 default:
                     throw new ArgumentException("Unsupported PSU type: " + psuType);
             }
+        }
+
+        public List<PsuType> GetAvailablePSUTypes()
+        {
+            // Return a list of available PSU types
+            return new List<PsuType>
+            {
+                PsuType.PSU3000
+                // Add more PSU types here if needed
+            };
         }
     }
 }
