@@ -270,6 +270,7 @@ public class Psu2000 : IPsu
     // Custom methods
     public string GetSerialNumber()
     {
+        Console.WriteLine("Nominal current: " + GetNominalCurrent());
         var com = GetComport();
         // reading serial number
         List<byte> serialresponse;
@@ -340,7 +341,38 @@ public class Psu2000 : IPsu
         
         List<byte> response;
         byte[] bytesToSend = { 0x74, 0x00, 0x02, 0x00, 0x76 };
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSend, 0, bytesToSend.Length);
+            Thread.Sleep(50);
+            response = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    response.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+        }
+
+        byte[] byteArray = { response[6], response[5], response[4], response[3] };
+        return BitConverter.ToSingle(byteArray, 0);
+    }
+
+    private double GetNominalCurrent()
+    {
+        var com = GetComport();
+        
+        List<byte> response;
+        byte[] bytesToSend = { 0x74, 0x00, 0x03, 0x00, 0x77 };
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
