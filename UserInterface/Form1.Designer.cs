@@ -143,6 +143,7 @@ namespace UserInterface
             textBox14.Name = "textBox14";
             textBox14.Size = new Size(115, 27);
             textBox14.TabIndex = 23;
+            textBox14.TextChanged += textBox14_TextChanged;
             // 
             // textBox17
             // 
@@ -241,6 +242,7 @@ namespace UserInterface
             button7.TabIndex = 40;
             button7.Text = "publish";
             button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
             // 
             // button3
             // 
@@ -260,6 +262,7 @@ namespace UserInterface
             button8.TabIndex = 42;
             button8.Text = "connect";
             button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
             // 
             // textBox3
             // 
@@ -267,6 +270,7 @@ namespace UserInterface
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(125, 27);
             textBox3.TabIndex = 43;
+            textBox3.TextChanged += textBox3_TextChanged;
             // 
             // textBox6
             // 
@@ -274,6 +278,7 @@ namespace UserInterface
             textBox6.Name = "textBox6";
             textBox6.Size = new Size(125, 27);
             textBox6.TabIndex = 44;
+            textBox6.TextChanged += textBox6_TextChanged;
             // 
             // textBox7
             // 
@@ -281,6 +286,7 @@ namespace UserInterface
             textBox7.Name = "textBox7";
             textBox7.Size = new Size(125, 27);
             textBox7.TabIndex = 45;
+            textBox7.TextChanged += textBox7_TextChanged;
             // 
             // Form1
             // 

@@ -107,6 +107,41 @@ public partial class Form1 : Form
         DisplayVoltageAndCurrent();
     }
 
+
+
+
+    private void button3_Click(object sender, EventArgs e)
+    {
+        //subscribe_button
+    }
+
+    private void button7_Click(object sender, EventArgs e)
+    {
+        //publish_button
+    }
+
+    private void button8_Click(object sender, EventArgs e)
+    {
+        //connect
+    }
+
+    private void textBox7_TextChanged(object sender, EventArgs e)
+    {
+        //subscribe_textbox
+    }
+
+    private void textBox6_TextChanged(object sender, EventArgs e)
+    {
+        //publish_textox
+    }
+
+    private void textBox3_TextChanged(object sender, EventArgs e)
+    {
+        //connect_textbox
+    }
+
+
+
     private void button6_Click(object sender, EventArgs e)
     {
         //on_off button
@@ -134,17 +169,7 @@ public partial class Form1 : Form
 
     }
 
-    private void Form1_Load(object sender, EventArgs e)
-    {
-
-    }
-
-    private void publish_Click(object sender, EventArgs e)
-    {
-
-    }
-
-    private void button3_Click(object sender, EventArgs e)
+    private void textBox14_TextChanged(object sender, EventArgs e)
     {
 
     }
