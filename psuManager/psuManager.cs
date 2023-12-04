@@ -44,13 +44,14 @@ public class Psu2000 : IPsu
 {
     public Psu2000()
     {
-        //ActivateRemoteControl();
+        Test();
     }
 
     public void Test()
     {
         var availablePorts = SerialPort.GetPortNames();
         var validPorts = new List<string>();
+        var portsName = new List<string>();
         
         foreach (var comPort in availablePorts)
         {
@@ -114,11 +115,22 @@ public class Psu2000 : IPsu
             
             // If we reached here, we passed all the checks and can add the comport to the list of valid comports
             validPorts.Add(comPort);
+            
+            string binary = Convert.ToString(deviceResponse[0], 2);
+            string payloadLengtBinaryString = binary.Substring(4);
+            int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
+
+            string deviceName = "";
+            for (var i = 0; i < payloadLength; i++)
+            {
+                deviceName += Convert.ToChar(deviceResponse[3 + i]);
+            }
+            portsName.Add(deviceName);
         }
 
-        foreach (var validPort in validPorts)
+        for (var i = 0; i < validPorts.Count; i++)
         {
-            Console.WriteLine(validPort);
+            Console.WriteLine(validPorts[i] + ": " + portsName[i]);
         }
     }
     
