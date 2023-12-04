@@ -4,10 +4,15 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>MqttClient</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="M2Mqtt" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PsuManager\PsuManager.csproj" />
   </ItemGroup>
 
 </Project>

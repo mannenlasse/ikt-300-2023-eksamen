@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyMqttClient\MyMqttClient.csproj" />
+    <ProjectReference Include="..\PsuManager\PsuManager.csproj" />
+  </ItemGroup>
+
 </Project>

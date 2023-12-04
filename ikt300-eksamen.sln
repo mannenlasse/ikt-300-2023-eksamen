@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserInterface", "UserInterf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PsuManager", "PsuManager\PsuManager.csproj", "{DCD54E3F-EC13-4AD0-A59E-A38C97640D84}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MqttClient", "MqttClient\MqttClient.csproj", "{25D5E8C9-6E2C-406C-907D-31088EFD606F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyMqttClient", "MyMqttClient\MyMqttClient.csproj", "{25D5E8C9-6E2C-406C-907D-31088EFD606F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsuController", "PsuController\PsuController.csproj", "{7E64460C-5152-4CB5-8AAE-C1B8E160C608}"
 EndProject
