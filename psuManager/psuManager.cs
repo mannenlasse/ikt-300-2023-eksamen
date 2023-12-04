@@ -1,4 +1,5 @@
-﻿using System.IO.Ports;
+﻿using System.Diagnostics;
+using System.IO.Ports;
 using System.Text.Json;
 
 namespace PsuManager;
@@ -33,6 +34,7 @@ public interface IPsu
     public string GetCurrent();
     public void StopOperation();
     public void LockUnlock();
+    public void Test();
     
     // Custom
     public string GetSerialNumber();
@@ -42,7 +44,82 @@ public class Psu2000 : IPsu
 {
     public Psu2000()
     {
-        ActivateRemoteControl();
+        //ActivateRemoteControl();
+    }
+
+    public void Test()
+    {
+        var availablePorts = SerialPort.GetPortNames();
+        var validPorts = new List<string>();
+        
+        foreach (var comPort in availablePorts)
+        {
+            // Here we check if the response matches the valid response, for getting the serial number
+            // Telegram structure:
+            // Byte 0 = SD, Byte 1 = DN, Byte 2 = OBJ, Byte 3+x = DATA, Last two bytes = CS
+            //
+            // Check 1: Did the response timeout?
+            // Check 2: Is the response larger than 0?
+            // Check 3: Since we know serial number is OBJ=0 in the list, we can check if byte 2 is 0x00
+            // Check 4: The response must include SD, DN, OBJ, DATA and CS, meaning at least 1+1+1+2+1=6 in size
+            
+            byte[] bytesToSend = { 0x7F, 0x00, 0x00, 0x00, 0x7F };
+            var port = new SerialPort(comPort, 115200, 0, 8, StopBits.One);
+            port.ReadTimeout = 2000; // Sets a timeout for our port.Read()
+            
+            Thread.Sleep(500);
+            port.Open();
+            // write to the USB port
+            port.Write(bytesToSend, 0, bytesToSend.Length);
+            Thread.Sleep(500);
+
+            var deviceResponse = new List<byte>();
+            var length = port.BytesToRead;
+            
+            if (length > 6)
+            {
+                byte[] message = new byte[length];
+
+                try
+                {
+                    port.Read(message, 0, length);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // Check 1 or some other error
+                    port.Close();
+                    break;
+                }
+                
+                foreach (var t in message)
+                {
+                    deviceResponse.Add(t);
+                }
+            }
+            else
+            {
+                // Check 2 and Check 4
+                port.Close();
+                break;
+            }
+            port.Close();
+            Thread.Sleep(500);
+
+            if (deviceResponse[2] != 0x00)
+            {
+                // Check 3
+                break;
+            }
+            
+            // If we reached here, we passed all the checks and can add the comport to the list of valid comports
+            validPorts.Add(comPort);
+        }
+
+        foreach (var validPort in validPorts)
+        {
+            Console.WriteLine(validPort);
+        }
     }
     
     public void SetVoltage(float setVolt)
@@ -100,8 +177,6 @@ public class Psu2000 : IPsu
 
         if (newcs1 != "")
         {
-
-
             newbytesWithoutChecksum[newarrayLength - 2] = Convert.ToByte(newcs1, 16);
             newbytesWithoutChecksum[newarrayLength - 1] = Convert.ToByte(newcs2, 16);
         }
@@ -515,4 +590,7 @@ internal class Psu3000 : IPsu
     {
         throw new NotImplementedException();
     }
+    
+    public void Test()
+    {}
 }

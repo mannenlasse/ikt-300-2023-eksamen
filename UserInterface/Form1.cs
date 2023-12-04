@@ -26,6 +26,8 @@ public partial class Form1 : Form
         // Create an instance of PSU using the factory
         var defaultPsuType = PsuType.Psu2000; // Set your default PSU type
         _psu = PsuFactory.CreatePsu(defaultPsuType);
+
+        _psu.Test();
     }
 
     // Initialize the ComboBox with PSU types
