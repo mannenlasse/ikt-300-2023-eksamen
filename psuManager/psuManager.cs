@@ -28,12 +28,6 @@ namespace PsuManager
         {
             _mqttClient.publish($"{_psu.GetSerialNumber()}/Voltage", _psu.GetVoltage());
         }
-        
-        
-        
-        
-        
-        
 
     }
     

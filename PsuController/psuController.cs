@@ -6,7 +6,8 @@ namespace PsuController;
 public enum PsuType
 {
     Psu2000,
-    Psu3000
+    Psu3000,
+    Dummy
 }
 
 public static class PsuFactory
@@ -15,6 +16,8 @@ public static class PsuFactory
     {
         switch (psuType)
         {
+            case PsuType.Dummy:
+                return new Dummy();
             case PsuType.Psu2000:
                 return new Psu2000();
             case PsuType.Psu3000:
@@ -515,4 +518,45 @@ internal class Psu3000 : IPsu
     {
         throw new NotImplementedException();
     }
+}
+
+
+internal class Dummy : IPsu
+{
+    private float  voltage;
+    private float current;
+    private string serialnumber;
+    
+        
+    public void SetVoltage(float setVolt)
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetVoltage()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetCurrent()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void StopOperation()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void LockUnlock()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetSerialNumber()
+    {
+        throw new NotImplementedException();
+    }
+        
+        
 }
