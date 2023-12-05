@@ -112,31 +112,33 @@ public partial class Form1 : Form
 
 
 
-    string m_PSUID = "12";
-    string message = "this is a test";
-    private void button3_Click(object sender, EventArgs e)
-    {
-        //subscribe_button
-        string topic = string.Format("/PSU/PSU2000/12/#");
-
-
-        _mqttClient.Subscribe(topic);
-    }
-
-    private void button7_Click(object sender, EventArgs e)
-    {
-        
-        string topic = string.Format("/PSU/PSU2000/{0}/#", m_PSUID);
-
-        //publish_button
-        _mqttClient.publish(topic, message);
-    }
-
+    string m_PSUID;
+    string message;
+    
+    
+    
     private void button8_Click(object sender, EventArgs e)
     {
         //connect
         _mqttClient.connectClient();
     }
+
+    
+    private void button3_Click(object sender, EventArgs e)
+    {
+        //subscribe_button
+        _mqttClient.Subscribe(string.Format(textBox7.Text));
+    }
+    
+    
+    
+    private void button7_Click(object sender, EventArgs e)
+    {
+        //publish_button
+        _mqttClient.publish(string.Format(textBox7.Text), string.Format(textBox6.Text));
+        
+    }
+
 
 
     private void textBox7_TextChanged(object sender, EventArgs e)

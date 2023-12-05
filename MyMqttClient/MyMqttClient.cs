@@ -7,9 +7,8 @@ namespace MyMQTTClient
     public class MyMqtt
     {
         private string clientID;
-        private string message_PSUID;
         static string connectionstring = "localhost";
-        
+        private string topic;
 
         MqttClient client = new MqttClient(connectionstring);
 
@@ -25,43 +24,29 @@ namespace MyMQTTClient
         }
         
 
-        public void Subscribe(string topic)
+        
+        public void Subscribe(string topicInput)
         {
-
-            client.Subscribe(new String[] { topic }, new byte[] { 2 });
+            
+            Console.WriteLine(topicInput);
+            string topic = string.Format("/PSU/PSU2000/{0}/#", topicInput);
+            client.Subscribe(new string[] { topic }, new byte[] { 2 });
             Console.WriteLine("Subscribed to " + topic );
 
-
+            
         }
 
         
-        
-        
-        
 
-        public void publish(string sender, string e)
+        public void publish(string topic, string message)
         {
-            string topic = string.Format("/PSU/PSU2000/{0}/{1}", "test");
+            topic = string.Format("/PSU/PSU2000/{0}/{1}", this.topic, message);
             client.Publish(topic, Encoding.UTF8.GetBytes(topic), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
-            Console.WriteLine("Published to topic: " + topic );
-
+            Console.WriteLine("Published message " + message + " to the topic: " + topic );
         }
         
         
         
-        /*
-         public void Connect(object sender, EventArgs e) {
-             string connectionString = "localhost";
-             m_Client = new MqttClient(connectionString);
-             clientID = Guid.NewGuid().ToString();
-             m_Client.Connect(clientID);
-         }
-
-         private void Publish(object sender, EventArgs e) {
-             string topic = string.Format("/PSU/PSU2000/{0}/{1}", m_PSUID);
-             m_Client.Publish(topic, Encoding.UTF8.GetBytes(topic), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
-         }
-        */
 
     }
 
