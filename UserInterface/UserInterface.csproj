@@ -14,7 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyMqttClient\MyMqttClient.csproj" />
     <ProjectReference Include="..\PsuController\PsuController.csproj" />
+    <ProjectReference Include="..\PsuManager\PsuManager.csproj" />
   </ItemGroup>
 
 </Project>

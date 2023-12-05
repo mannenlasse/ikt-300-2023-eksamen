@@ -2,13 +2,16 @@ using System;
 using System.Globalization;
 using System.Windows.Forms;
 using PsuController;
+using MyMQTTClient;
+using uPLibrary.Networking.M2Mqtt;
+using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace UserInterface;
 
 public partial class Form1 : Form
 {
     private IPsu _psu;
-
+    private MyMqtt _mqttClient = new MyMqtt(); 
     private ComboBox _comboBoxPsuTypes;
 
     public Form1()
@@ -109,21 +112,32 @@ public partial class Form1 : Form
 
 
 
-
+    string m_PSUID = "12";
+    string message = "this is a test";
     private void button3_Click(object sender, EventArgs e)
     {
         //subscribe_button
+        string topic = string.Format("/PSU/PSU2000/12/#");
+
+
+        _mqttClient.Subscribe(topic);
     }
 
     private void button7_Click(object sender, EventArgs e)
     {
+        
+        string topic = string.Format("/PSU/PSU2000/{0}/#", m_PSUID);
+
         //publish_button
+        _mqttClient.publish(topic, message);
     }
 
     private void button8_Click(object sender, EventArgs e)
     {
         //connect
+        _mqttClient.connectClient();
     }
+
 
     private void textBox7_TextChanged(object sender, EventArgs e)
     {
