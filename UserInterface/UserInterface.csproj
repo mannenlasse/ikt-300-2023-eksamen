@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PsuManager\PsuManager.csproj" />
+    <ProjectReference Include="..\PsuController\PsuController.csproj" />
   </ItemGroup>
 
 </Project>

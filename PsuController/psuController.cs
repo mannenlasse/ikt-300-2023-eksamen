@@ -1,7 +1,7 @@
 ﻿using System.IO.Ports;
 using System.Text.Json;
 
-namespace PsuManager;
+namespace PsuController;
 
 public enum PsuType
 {
@@ -371,7 +371,7 @@ public class Psu2000 : IPsu
     private static string? GetComport()
     {
         // Read the entire JSON file content as a string
-        var jsonString = File.ReadAllText(@"./PsuManager/comport.json");
+        var jsonString = File.ReadAllText(@"./PsuController/comport.json");
 
         // Use JsonDocument to parse the JSON string
         var document = JsonDocument.Parse(jsonString);
