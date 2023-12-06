@@ -1,10 +1,7 @@
-﻿using System.Text;
-using MyMQTTClient;
+﻿using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 using PsuManager;
-
-using uPLibrary.Networking.M2Mqtt.Messages;
 using PsuController;
-using uPLibrary.Networking.M2Mqtt;
 
 namespace PsuManager
 {
@@ -12,10 +9,9 @@ namespace PsuManager
 
     public class psuManager
     {
-        private IPsu _psu;
-        private MyMqtt _mqttClient;
+        private Psu2000 _psuController = new Psu2000();
 
-
+/*
         public psuManager()
         {
             _mqttClient = new MyMqtt();
@@ -23,10 +19,10 @@ namespace PsuManager
             _mqttClient.Subscribe("+");
         }
 
-
-        private void PublishVoltage()
+*/
+        public void SerialNumber()
         {
-            _mqttClient.publish($"{_psu.GetSerialNumber()}/Voltage", _psu.GetVoltage());
+            Console.WriteLine("The serial number for this PSU is: " + _psuController.GetSerialNumber() );
         }
 
     }
