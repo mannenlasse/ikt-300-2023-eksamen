@@ -11,12 +11,11 @@ namespace UserInterface;
 public partial class Form1 : Form
 {
     private IPsu _psu;
-    private MyMqtt _mqttClient = new MyMqtt(); 
+    private MyMqtt _mqttClient = new MyMqtt();
     private ComboBox _comboBoxPsuTypes;
 
     public Form1()
     {
-        InitializeComponent();
         InitializePowerSupply();
         InitializeComboBox();
         DisplayPsuInfo();
@@ -64,7 +63,7 @@ public partial class Form1 : Form
     private void DisplayPsuInfo()
     {
         var currentVoltage = _psu.GetVoltage() + "V";
-        var currentCurrent = _psu.GetVoltage() + "A";
+        var currentCurrent = _psu.GetCurrent() + "A";
 
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
@@ -75,7 +74,7 @@ public partial class Form1 : Form
     public void DisplayVoltageAndCurrent()
     {
         var currentVoltage = _psu.GetVoltage() + "V";
-        var currentCurrent = _psu.GetVoltage() + "A";
+        var currentCurrent = _psu.GetCurrent() + "A";
 
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
@@ -90,16 +89,53 @@ public partial class Form1 : Form
         richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
 
+
+    //User-defined method to lock or unlock the psu
+    public void lockUnlock()
+    {
+        var locked = "PSU Locked";
+        var unlocked = "PSU Unlocked";
+
+        if (_psu != null)
+        {
+            // Check the current lock state
+            bool isLocked = _psu.GetLockState();
+
+            // Perform the lock or unlock based on the current state
+            if (isLocked)
+            {
+                // Unlock the PSU
+                _psu.UnlockPSU();
+                richTextBox2.Text = unlocked;
+            }
+            else
+            {
+                // Lock the PSU
+                _psu.LockPSU();
+                richTextBox2.Text = locked;
+            }
+
+            // Update the UI or provide feedback as needed
+            DisplayPsuInfo();
+        }
+    }
+
+
+
+
+
+
     // ... Other UI event handlers and methods ...
 
-    // Example event handler for a button click
+    // Refresh Button
     private void button2_Click(object sender, EventArgs e)
     {
         DisplayVoltageAndCurrent();
         StartDisplayOutput();
     }
 
-    // Example event handler for another button click
+
+    //Set voltage button
     private void button4_Click_1(object sender, EventArgs e)
     {
         // This code allows for "." instead of ","
@@ -110,33 +146,38 @@ public partial class Form1 : Form
         DisplayVoltageAndCurrent();
     }
 
+    //set X Button
+    private void button5_Click(object sender, EventArgs e)
+    {
+        richTextBox2.Text = "x is sett";
+    }
 
 
     string m_PSUID;
     string message;
-    
-    
-    
+
+
+
     private void button8_Click(object sender, EventArgs e)
     {
         //connect
         _mqttClient.connectClient();
     }
 
-    
+
     private void button3_Click(object sender, EventArgs e)
     {
         //subscribe_button
         _mqttClient.Subscribe(string.Format(textBox7.Text));
     }
-    
-    
-    
+
+
+
     private void button7_Click(object sender, EventArgs e)
     {
         //publish_button
         _mqttClient.publish(string.Format(textBox7.Text), string.Format(textBox6.Text));
-        
+
     }
 
 
@@ -160,7 +201,7 @@ public partial class Form1 : Form
 
     private void button6_Click(object sender, EventArgs e)
     {
-        //on_off button
+        lockUnlock();
     }
 
 
@@ -180,12 +221,12 @@ public partial class Form1 : Form
 
     }
 
-    private void button5_Click(object sender, EventArgs e)
+    private void textBox14_TextChanged(object sender, EventArgs e)
     {
 
     }
 
-    private void textBox14_TextChanged(object sender, EventArgs e)
+    private void richTextBox2_TextChanged(object sender, EventArgs e)
     {
 
     }

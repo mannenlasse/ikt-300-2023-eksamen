@@ -36,17 +36,22 @@ public interface IPsu
     public string GetCurrent();
     public void StopOperation();
     public void LockUnlock();
-    
+    public bool GetLockState();
+    public void UnlockPSU();
+    public void LockPSU();
+
     // Custom
     public string GetSerialNumber();
 }
 
 public class Psu2000 : IPsu
 {
+    /*
     public Psu2000()
     {
         ActivateRemoteControl();
     }
+    */
     
     public void SetVoltage(float setVolt)
     {
@@ -316,10 +321,97 @@ public class Psu2000 : IPsu
         throw new NotImplementedException();
     }
 
+
     public void LockUnlock()
     {
-        throw new NotImplementedException();
+        // Check the current lock state
+        var isLocked = GetLockState();
+
+        // Send the appropriate command based on the lock state
+        if (isLocked)
+        {
+            // PSU is locked; implement unlock logic if needed
+
+            UnlockPSU();
+        }
+        else
+        {
+            // PSU is unlocked; implement lock logic if needed
+            LockPSU();
+        }
     }
+
+    public bool GetLockState()
+    {
+        var com = GetComport();
+        bool isLocked = true;
+        byte[] lockStateCommand = { 0xF2, 0x00, 0x36, 0x02, 0x00, 0x01, 0x47 };
+
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(lockStateCommand, 0, lockStateCommand.Length);
+            byte[] response = new byte[2];
+            port.Read(response, 0, response.Length);
+            Thread.Sleep(500);
+            port.Close();
+            Thread.Sleep(500);
+
+            // Parse the response to determine the lock state
+            if (response[1] == 0x01)
+            {
+                
+                isLocked = true; // PSU is locked; 
+            }
+            else
+            {
+                
+                isLocked = false; // PSU is unlocked; 
+            }
+        }
+        return isLocked;
+    }
+
+
+    public void LockPSU()
+    {
+        var com = GetComport();
+
+        byte[] lockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x11, 0x01, 0x47 };
+
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(lockCommand, 0, lockCommand.Length);
+            Thread.Sleep(500);
+            port.Close();
+            Thread.Sleep(500);
+        }
+    }
+
+    public void UnlockPSU()
+    {
+        var com = GetComport();
+
+        byte[] unlockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 };
+
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(unlockCommand, 0, unlockCommand.Length);
+            Thread.Sleep(500);
+            port.Close();
+            Thread.Sleep(500);
+        }
+    }
+
+
+
+
+
 
     // Custom methods
     public string GetSerialNumber()
@@ -450,7 +542,8 @@ public class Psu2000 : IPsu
         byte[] byteArray = { response[6], response[5], response[4], response[3] };
         return BitConverter.ToSingle(byteArray, 0);
     }
-    
+
+    /*
     private void ActivateRemoteControl()
     {
         var com = GetComport();
@@ -485,7 +578,10 @@ public class Psu2000 : IPsu
             }
         }
     }
+        */
+
 }
+
 
 internal class Psu3000 : IPsu
 {
@@ -510,6 +606,21 @@ internal class Psu3000 : IPsu
     }
 
     public void LockUnlock()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void GetLockState()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UnlockPSU()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void LockPSU()
     {
         throw new NotImplementedException();
     }
@@ -549,6 +660,20 @@ internal class Dummy : IPsu
     }
 
     public void LockUnlock()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool GetLockState()
+    {
+        throw new NotImplementedException();
+    }
+    public void UnlockPSU()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void LockPSU()
     {
         throw new NotImplementedException();
     }
