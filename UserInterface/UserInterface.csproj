@@ -9,10 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="M2Mqtt" Version="4.3.0" />
     <PackageReference Include="System.IO.Ports" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyMqttClient\MyMqttClient.csproj" />
+    <ProjectReference Include="..\PsuController\PsuController.csproj" />
     <ProjectReference Include="..\PsuManager\PsuManager.csproj" />
   </ItemGroup>
 
