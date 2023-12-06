@@ -1,14 +1,17 @@
 using System;
 using System.Globalization;
 using System.Windows.Forms;
-using PsuManager;
+using PsuController;
+using MyMQTTClient;
+using uPLibrary.Networking.M2Mqtt;
+using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace UserInterface;
 
 public partial class Form1 : Form
 {
     private IPsu _psu;
-
+    private MyMqtt _mqttClient = new MyMqtt(); 
     private ComboBox _comboBoxPsuTypes;
 
     public Form1()
@@ -31,9 +34,7 @@ public partial class Form1 : Form
     // Initialize the ComboBox with PSU types
     private void InitializeComboBox()
     {
-        _comboBoxPsuTypes = new ComboBox();
-        _comboBoxPsuTypes.Location = new System.Drawing.Point(12, 12); // Set appropriate location
-        _comboBoxPsuTypes.DropDownStyle = ComboBoxStyle.DropDownList;
+        comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
         PopulatePsuTypes();
         Controls.Add(_comboBoxPsuTypes);
     }
@@ -41,20 +42,20 @@ public partial class Form1 : Form
     // Populate the ComboBox with PSU types
     private void PopulatePsuTypes()
     {
-        _comboBoxPsuTypes.Items.AddRange(Enum.GetValues(typeof(PsuType)).Cast<object>().ToArray());
-        _comboBoxPsuTypes.SelectedIndex = 0; // Set the default selection
+        comboBox2.Items.AddRange(Enum.GetValues(typeof(PsuType)).Cast<object>().ToArray());
+        comboBox2.SelectedIndex = 0; // Set the default selection
     }
 
     // Subscribe to ComboBox and other events
     private void SubscribeToEvents()
     {
-        _comboBoxPsuTypes.SelectedIndexChanged += _comboBoxPsuTypes_SelectedIndexChanged;
+        comboBox2.SelectedIndexChanged += _comboBoxPsuTypes_SelectedIndexChanged;
     }
 
     // Event handler for ComboBox selection change
     private void _comboBoxPsuTypes_SelectedIndexChanged(object sender, EventArgs e)
     {
-        var selectedPsuType = (PsuType)_comboBoxPsuTypes.SelectedItem;
+        var selectedPsuType = (PsuType)comboBox2.SelectedItem;
         _psu = PsuFactory.CreatePsu(selectedPsuType);
         DisplayPsuInfo();
     }
@@ -85,7 +86,7 @@ public partial class Form1 : Form
     {
         var currentVoltage = "Current voltage: " + _psu.GetVoltage() + "V";
         var currentCurrent = "Current current: " + _psu.GetCurrent() + "A";
-        
+
         richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
 
@@ -104,13 +105,90 @@ public partial class Form1 : Form
         // This code allows for "." instead of ","
         var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
         ci.NumberFormat.CurrencyDecimalSeparator = ".";
-        
+
         _psu.SetVoltage(float.Parse(textBox14.Text, NumberStyles.Any, ci));
         DisplayVoltageAndCurrent();
     }
+
+
+
+    string m_PSUID;
+    string message;
+    
+    
+    
+    private void button8_Click(object sender, EventArgs e)
+    {
+        //connect
+        _mqttClient.connectClient();
+    }
+
+    
+    private void button3_Click(object sender, EventArgs e)
+    {
+        //subscribe_button
+        _mqttClient.Subscribe(string.Format(textBox7.Text));
+    }
+    
+    
+    
+    private void button7_Click(object sender, EventArgs e)
+    {
+        //publish_button
+        _mqttClient.publish(string.Format(textBox7.Text), string.Format(textBox6.Text));
+        
+    }
+
+
+
+    private void textBox7_TextChanged(object sender, EventArgs e)
+    {
+        //subscribe_textbox
+    }
+
+    private void textBox6_TextChanged(object sender, EventArgs e)
+    {
+        //publish_textox
+    }
+
+    private void textBox3_TextChanged(object sender, EventArgs e)
+    {
+        //connect_textbox
+    }
+
+
 
     private void button6_Click(object sender, EventArgs e)
     {
         //on_off button
     }
+
+
+
+    private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void textBox2_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void textBox9_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void button5_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void textBox14_TextChanged(object sender, EventArgs e)
+    {
+
+    }
 }
+
+

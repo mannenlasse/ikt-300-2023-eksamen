@@ -1,4 +1,4 @@
-using PsuManager;
+using PsuController;
 
 namespace UserInterface;
 
