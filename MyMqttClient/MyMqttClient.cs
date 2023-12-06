@@ -40,7 +40,8 @@ namespace MyMQTTClient
 
         public void publish(string topic, string message)
         {
-            topic = string.Format("/PSU/PSU2000/{0}/{1}", this.topic, message);
+     
+             topic = string.Format("/PSU/PSU2000/{0}/{1}", topic, message);
             client.Publish(topic, Encoding.UTF8.GetBytes(topic), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
             Console.WriteLine("Published message " + message + " to the topic: " + topic );
         }
