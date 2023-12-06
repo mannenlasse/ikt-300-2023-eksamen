@@ -91,48 +91,40 @@ public partial class Form1 : Form
 
 
     //User-defined method to lock or unlock the psu
-    public void lockUnlock()
+
+    public void LockUnlock()
     {
         var locked = "PSU Locked";
         var unlocked = "PSU Unlocked";
 
-        if (_psu != null)
+        // Check the current lock state
+        var isLocked = _psu.GetLockState();
+
+        // Send the appropriate command based on the lock state
+        if (isLocked)
         {
-            // Check the current lock state
-            bool isLocked = _psu.GetLockState();
-
-            // Perform the lock or unlock based on the current state
-            if (isLocked)
-            {
-                // Unlock the PSU
-                _psu.UnlockPSU();
-                richTextBox2.Text = unlocked;
-            }
-            else
-            {
-                // Lock the PSU
-                _psu.LockPSU();
-                richTextBox2.Text = locked;
-            }
-
-            // Update the UI or provide feedback as needed
-            DisplayPsuInfo();
+            // PSU is locked; implement unlock logic if needed
+            richTextBox2.Text = unlocked;
+            _psu.UnlockPSU();
+        }
+        else
+        {
+            // PSU is unlocked; implement lock logic if needed
+            richTextBox2.Text = locked;
+            _psu.LockPSU();
         }
     }
-
-
-
 
 
 
     // ... Other UI event handlers and methods ...
 
     // Refresh Button
-    private void button2_Click(object sender, EventArgs e)
+    private void button2_Click_1(object sender, EventArgs e)
     {
         DisplayVoltageAndCurrent();
-        StartDisplayOutput();
     }
+
 
 
     //Set voltage button
@@ -201,7 +193,7 @@ public partial class Form1 : Form
 
     private void button6_Click(object sender, EventArgs e)
     {
-        lockUnlock();
+        LockUnlock();
     }
 
 
@@ -230,6 +222,8 @@ public partial class Form1 : Form
     {
 
     }
-}
+
+
+
 
 

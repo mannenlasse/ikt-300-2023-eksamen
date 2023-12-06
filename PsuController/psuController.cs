@@ -35,7 +35,6 @@ public interface IPsu
     public string GetVoltage();
     public string GetCurrent();
     public void StopOperation();
-    public void LockUnlock();
     public bool GetLockState();
     public void UnlockPSU();
     public void LockPSU();
@@ -117,11 +116,11 @@ public class Psu2000 : IPsu
         List<byte> newResponseTelegram;
         using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
+            Thread.Sleep(50);
             port.Open();
             // write to the USB port
             port.Write(newbytesWithoutChecksum, 0, newbytesWithoutChecksum.Length);
-            Thread.Sleep(500);
+            Thread.Sleep(50);
 
             newResponseTelegram = new List<byte>();
             int length = port.BytesToRead;
@@ -136,7 +135,7 @@ public class Psu2000 : IPsu
                 }
             }
             port.Close();
-            Thread.Sleep(500);
+            Thread.Sleep(50);
         }
         if (newResponseTelegram[3] == 0)
         {
@@ -197,11 +196,11 @@ public class Psu2000 : IPsu
         List<byte> responseTelegram;
         using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
+            Thread.Sleep(50);
             port.Open();
             // write to the USB port
             port.Write(byteWithOutCheckSum, 0, byteWithOutCheckSum.Length);
-            Thread.Sleep(500);
+            Thread.Sleep(50);
 
             responseTelegram = new List<byte>();
             var length = port.BytesToRead;
@@ -216,7 +215,7 @@ public class Psu2000 : IPsu
                 }
             }
             port.Close();
-            Thread.Sleep(500);
+            Thread.Sleep(50);
         }
         
         var percentVoltString = responseTelegram[5].ToString("X") + responseTelegram[6].ToString("X");
@@ -280,11 +279,11 @@ public class Psu2000 : IPsu
         List<byte> responseTelegram;
         using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
+            Thread.Sleep(50);
             port.Open();
             // write to the USB port
             port.Write(byteWithOutCheckSum, 0, byteWithOutCheckSum.Length);
-            Thread.Sleep(500);
+            Thread.Sleep(50);
 
             responseTelegram = new List<byte>();
             var length = port.BytesToRead;
@@ -322,53 +321,49 @@ public class Psu2000 : IPsu
     }
 
 
-    public void LockUnlock()
-    {
-        // Check the current lock state
-        var isLocked = GetLockState();
 
-        // Send the appropriate command based on the lock state
-        if (isLocked)
-        {
-            // PSU is locked; implement unlock logic if needed
-
-            UnlockPSU();
-        }
-        else
-        {
-            // PSU is unlocked; implement lock logic if needed
-            LockPSU();
-        }
-    }
 
     public bool GetLockState()
     {
         var com = GetComport();
-        bool isLocked = true;
+        bool isLocked = false;
         byte[] lockStateCommand = { 0xF2, 0x00, 0x36, 0x02, 0x00, 0x01, 0x47 };
 
         using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
-            port.Open();
-            port.Write(lockStateCommand, 0, lockStateCommand.Length);
-            byte[] response = new byte[2];
-            port.Read(response, 0, response.Length);
-            Thread.Sleep(500);
-            port.Close();
-            Thread.Sleep(500);
+            try
+            {
+                port.Open();
+                port.Write(lockStateCommand, 0, lockStateCommand.Length);
+                Thread.Sleep(50);  // Adjust sleep duration if needed
 
-            // Parse the response to determine the lock state
-            if (response[1] == 0x01)
-            {
-                
-                isLocked = true; // PSU is locked; 
+                byte[] response = new byte[2];
+                port.Read(response, 0, response.Length);
+                Thread.Sleep(50);  // Adjust sleep duration if needed
+
+                // Parse the response to determine the lock state
+                if (response.Length == 2 && response[1] == 0x01)
+                {
+                    isLocked = true; // PSU is locked; 
+                }
+                else
+                {
+                    isLocked = false; // PSU is unlocked; 
+                }
             }
-            else
+            catch (Exception ex)
             {
-                
-                isLocked = false; // PSU is unlocked; 
+                // Handle the exception (e.g., log it)
+                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
             }
+            finally
+            {
+                if (port.IsOpen)
+                {
+                    port.Close();
+                }
+            }
+
         }
         return isLocked;
     }
@@ -377,17 +372,28 @@ public class Psu2000 : IPsu
     public void LockPSU()
     {
         var com = GetComport();
-
         byte[] lockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x11, 0x01, 0x47 };
 
         using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
-            port.Open();
-            port.Write(lockCommand, 0, lockCommand.Length);
-            Thread.Sleep(500);
-            port.Close();
-            Thread.Sleep(500);
+            try
+            {
+                port.Open();
+                port.Write(lockCommand, 0, lockCommand.Length);
+                Thread.Sleep(50);  // Adjust sleep duration if needed
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (e.g., log it)
+                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+            }
+            finally
+            {
+                if (port.IsOpen)
+                {
+                    port.Close();
+                }
+            }
         }
     }
 
@@ -399,12 +405,24 @@ public class Psu2000 : IPsu
 
         using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
-            port.Open();
-            port.Write(unlockCommand, 0, unlockCommand.Length);
-            Thread.Sleep(500);
-            port.Close();
-            Thread.Sleep(500);
+            try
+            {
+                port.Open();
+                port.Write(unlockCommand, 0, unlockCommand.Length);
+                Thread.Sleep(50);  // Adjust sleep duration if needed
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (e.g., log it)
+                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+            }
+            finally
+            {
+                if (port.IsOpen)
+                {
+                    port.Close();
+                }
+            }
         }
     }
 
@@ -520,7 +538,7 @@ public class Psu2000 : IPsu
         byte[] bytesToSend = { 0x74, 0x00, 0x03, 0x00, 0x77 };
         using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
-            Thread.Sleep(500);
+            Thread.Sleep(50);
             port.Open();
             port.Write(bytesToSend, 0, bytesToSend.Length);
             Thread.Sleep(50);
@@ -610,7 +628,7 @@ internal class Psu3000 : IPsu
         throw new NotImplementedException();
     }
 
-    public void GetLockState()
+    public bool GetLockState()
     {
         throw new NotImplementedException();
     }
@@ -659,10 +677,7 @@ internal class Dummy : IPsu
         throw new NotImplementedException();
     }
 
-    public void LockUnlock()
-    {
-        throw new NotImplementedException();
-    }
+    
 
     public bool GetLockState()
     {
