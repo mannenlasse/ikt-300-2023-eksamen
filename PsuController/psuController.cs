@@ -319,7 +319,37 @@ public class Psu2000 : IPsu
 
     public void LockUnlock()
     {
-        throw new NotImplementedException();
+        var com = GetComport();
+        
+        var bytesToSendToTurnOnRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x00, 0x01, 0x37 }; // Turn on remote control
+        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSendToTurnOnRc, 0, bytesToSendToTurnOnRc.Length);
+            Thread.Sleep(50);
+            var rcResponse = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    rcResponse.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+            if (rcResponse[3] ==0)
+            {
+                Console.WriteLine("Remote Control is turned off");
+            }
+            else
+            {
+                Console.WriteLine($"Remote control is not turned off due to error: {rcResponse[3].ToString()}");
+            }
+        }
     }
 
     // Custom methods
