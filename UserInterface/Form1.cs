@@ -69,6 +69,9 @@ public partial class Form1 : Form
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
         textBox5.Text = _psu.GetSerialNumber();
+        
+        var isLocked = _psu.GetLockState();
+        Console.Write(isLocked);
     }
 
     // User-defined method to display voltage
@@ -89,6 +92,31 @@ public partial class Form1 : Form
 
         richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
+    
+    
+    
+    
+    private void LockUnlock()
+    {
+        var isLocked = _psu.GetLockState();
+        Console.Write(isLocked);
+
+        if (isLocked)
+        {
+            _psu.UnLockPsu();
+            button6.Text = "Lock";
+        }
+        else
+        {
+            _psu.LockPsu();
+            button6.Text = "Unlock";
+
+        }
+        richTextBox2.AppendText("Power supply is now " + (_psu.GetLockState() ? "locked" : "unlocked") + "\n");
+    }
+    
+    
+    
 
     // ... Other UI event handlers and methods ...
 
@@ -160,7 +188,7 @@ public partial class Form1 : Form
 
     private void button6_Click(object sender, EventArgs e)
     {
-        //on_off button
+        LockUnlock();
     }
 
 

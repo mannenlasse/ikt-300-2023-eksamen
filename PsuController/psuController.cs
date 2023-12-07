@@ -35,7 +35,9 @@ public interface IPsu
     public string GetVoltage();
     public string GetCurrent();
     public void StopOperation();
-    public void LockUnlock();
+    public bool GetLockState();
+    public bool UnLockPsu();
+    public bool LockPsu();
     
     // Custom
     public string GetSerialNumber();
@@ -45,8 +47,9 @@ public class Psu2000 : IPsu
 {
     public Psu2000()
     {
-        ActivateRemoteControl();
     }
+    
+    private bool isLocked;
     
     public void SetVoltage(float setVolt)
     {
@@ -450,7 +453,108 @@ public class Psu2000 : IPsu
         byte[] byteArray = { response[6], response[5], response[4], response[3] };
         return BitConverter.ToSingle(byteArray, 0);
     }
+
+
+    public bool GetLockState()
+    {
+        var com = GetComport();
+        byte[] lockStateCommand = { 0xF2, 0x00, 0x36, 0x02, 0x00, 0x01, 0x47 };
+
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            try
+            {
+                port.Open();
+                port.Write(lockStateCommand, 0, lockStateCommand.Length);
+
+                Task.Delay(50).Wait(); // Adjust delay if needed
+
+                byte[] response = new byte[2];
+                port.Read(response, 0, response.Length);
+
+                Task.Delay(50).Wait(); // Adjust delay if needed
+
+                isLocked = response.Length == 2 && response[1] == 0x01;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details for debugging
+                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+            }
+            finally
+            {
+                if (port.IsOpen)
+                {
+                    port.Close();
+                }
+            }
+
+            return isLocked;
+        }
+    }
+
+    public bool LockPsu()
+    {
+        byte[] lockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x11, 0x01, 0x47 };
+
+        using (SerialPort port = new SerialPort(GetComport(), 115200, 0, 8, StopBits.One))
+        {
+            try
+            {
+                port.Open();
+                port.Write(lockCommand, 0, lockCommand.Length);
+
+                Task.Delay(500).Wait(); // Adjust delay if needed
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details for debugging
+                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+            }
+            finally
+            {
+                port.Close();
+            }
+
+            isLocked = true;
+            return isLocked;
+        }
+    }
+
+    public bool UnLockPsu()
+    {
+        byte[] unlockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 };
+
+        using (SerialPort port = new SerialPort(GetComport(), 115200, 0, 8, StopBits.One))
+        {
+            try
+            {
+                port.Open();
+                port.Write(unlockCommand, 0, unlockCommand.Length);
+
+                Task.Delay(500).Wait(); // Adjust delay if needed
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details for debugging
+                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+            }
+            finally
+            {
+                port.Close();
+            }
+
+            isLocked = false;
+            return !isLocked;
+        }
+    }
     
+
+
+
+
+
+
     private void ActivateRemoteControl()
     {
         var com = GetComport();
@@ -509,11 +613,19 @@ internal class Psu3000 : IPsu
         throw new NotImplementedException();
     }
 
-    public void LockUnlock()
+    public bool GetLockState()
+    {
+        throw new NotImplementedException();
+    }
+    public bool UnLockPsu()
     {
         throw new NotImplementedException();
     }
 
+    public bool LockPsu()
+    {
+        throw new NotImplementedException();
+    }
     public string GetSerialNumber()
     {
         throw new NotImplementedException();
@@ -548,7 +660,16 @@ internal class Dummy : IPsu
         throw new NotImplementedException();
     }
 
-    public void LockUnlock()
+    public bool GetLockState()
+    {
+        throw new NotImplementedException();
+    }
+    public bool UnLockPsu()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool LockPsu()
     {
         throw new NotImplementedException();
     }
