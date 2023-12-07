@@ -19,7 +19,7 @@ public static class PsuFactory
             case PsuType.Dummy:
                 return new Dummy();
             case PsuType.Psu2000:
-                return new Psu2000();
+                return new Psu2000("temp");
             case PsuType.Psu3000:
                 return new Psu3000();
             default:
@@ -45,15 +45,18 @@ public interface IPsu
 
 public class Psu2000 : IPsu
 {
-    public Psu2000()
+    public string ComPort { get; private set; }
+    public string SerialNumber { get; private set; }
+    
+    public Psu2000(string comPort)
     {
+        ComPort = comPort;
         ActivateRemoteControl();
+        SerialNumber = GetSerialNumber();
     }
     
     public void SetVoltage(float setVolt)
     {
-        var com = GetComport();
-        
         int percentSetValue = (int)Math.Round((25600 * setVolt) / 84);
 
         string hexValue = percentSetValue.ToString("X");
@@ -112,7 +115,7 @@ public class Psu2000 : IPsu
         }
 
         List<byte> newResponseTelegram;
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -148,8 +151,6 @@ public class Psu2000 : IPsu
     public string GetVoltage()
     {
         /* ----- First, we read the "wrong" voltage ----- */
-        var com = GetComport();
-        
         //SD = MessageType + CastType + Direction + Length
         var sdHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
         var sd = Convert.ToByte(sdHex.ToString(), 10);
@@ -192,7 +193,7 @@ public class Psu2000 : IPsu
 
         // now the byte array is ready to be sent
         List<byte> responseTelegram;
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -231,8 +232,6 @@ public class Psu2000 : IPsu
     public string GetCurrent()
     {
         /* ----- First, we read the "wrong" current ----- */
-        var com = GetComport();
-        
         //SD = MessageType + CastType + Direction + Length
         var sdHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
         var sd = Convert.ToByte(sdHex.ToString(), 10);
@@ -275,7 +274,7 @@ public class Psu2000 : IPsu
 
         // now the byte array is ready to be sent
         List<byte> responseTelegram;
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -326,13 +325,12 @@ public class Psu2000 : IPsu
     // Custom methods
     public string GetSerialNumber()
     {
-        var com = GetComport();
         // reading serial number
         List<byte> serialresponse;
         // Remember the dataframe setup, SD, DN,   OBJ, DATA checksum1, checksum2
         // OBJ = 0x01 = 1
         byte[] serialBytesToSend = { 0x7F, 0x00, 0x01, 0x00, 0x80 };
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -393,11 +391,9 @@ public class Psu2000 : IPsu
     
     private double GetNominalVoltage()
     {
-        var com = GetComport();
-        
         List<byte> response;
         byte[] bytesToSend = { 0x74, 0x00, 0x02, 0x00, 0x76 };
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -424,11 +420,9 @@ public class Psu2000 : IPsu
 
     private double GetNominalCurrent()
     {
-        var com = GetComport();
-        
         List<byte> response;
         byte[] bytesToSend = { 0x74, 0x00, 0x03, 0x00, 0x77 };
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -455,10 +449,8 @@ public class Psu2000 : IPsu
     
     public void ActivateRemoteControl()
     {
-        var com = GetComport();
-        
         var bytesToSendToTurnOnRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn on remote control
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -479,7 +471,7 @@ public class Psu2000 : IPsu
             Thread.Sleep(500);
             if (rcResponse[3] ==0)
             {
-                Console.WriteLine("Remote Control is turned on");
+                //Console.WriteLine("Remote Control is turned on");
             }
             else
             {
