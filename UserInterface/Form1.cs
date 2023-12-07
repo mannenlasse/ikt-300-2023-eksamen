@@ -14,6 +14,8 @@ public partial class Form1 : Form
     private MyMqtt _mqttClient = new MyMqtt();
     private ComboBox _comboBoxPsuTypes;
     private bool isRemoteControlOn = true;
+    private bool isOperationRunning = false;
+    private Thread currentDisplayThread;
     private int Xseconds;
 
     public Form1()
@@ -151,7 +153,18 @@ public partial class Form1 : Form
    }
 
    
-   
+   private void StopOperation()
+   {
+       // If the current display thread is running, wait for it to finish
+       if (currentDisplayThread != null && currentDisplayThread.IsAlive)
+       {
+           currentDisplayThread.Join();
+       }
+
+       // Set the voltage to 0
+       _psu.SetVoltage(0);
+       DisplayVoltageAndCurrent();
+   }
  
 
     private void RemoteOnOf()
@@ -244,12 +257,11 @@ public partial class Form1 : Form
     private void button6_Click(object sender, EventArgs e)
     {
         //stop operation 
-
+        StopOperation();
     }
 
     private void button1_Click(object sender, EventArgs e)
     {
-
         RemoteOnOf();
     }
 
