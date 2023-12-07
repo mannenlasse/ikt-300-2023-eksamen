@@ -1,4 +1,5 @@
 ﻿using System.IO.Ports;
+using System.Text;
 using System.Text.Json;
 
 namespace PsuController;
@@ -469,12 +470,22 @@ public class Psu2000 : IPsu
 
                 Task.Delay(50).Wait(); // Adjust delay if needed
 
-                byte[] response = new byte[2];
-                port.Read(response, 0, response.Length);
+                byte[] response = new byte[1024];
+                int bytesRead = port.Read(response, 0, response.Length);
 
-                Task.Delay(50).Wait(); // Adjust delay if needed
-
-                isLocked = response.Length == 2 && response[1] == 0x01;
+                if (bytesRead >= 2 && response[1] == 0x01)
+                {
+                    isLocked = true;
+                }
+                else if (bytesRead >= 2 && response[1] == 0x02)
+                {
+                    isLocked = false;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid response received while checking lock state.");
+                    isLocked = false;
+                }
             }
             catch (Exception ex)
             {
@@ -493,62 +504,93 @@ public class Psu2000 : IPsu
         }
     }
 
+
+
     public bool LockPsu()
     {
-        byte[] lockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x11, 0x01, 0x47 };
+        var com = GetComport();
+        byte[] lockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Create the lock command byte array
 
-        using (SerialPort port = new SerialPort(GetComport(), 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
             try
             {
-                port.Open();
-                port.Write(lockCommand, 0, lockCommand.Length);
+                port.Open(); // Open the serial port
+                var lockCommandString = Encoding.ASCII.GetString(lockCommand); // Convert the byte array to a string
+                port.Write(lockCommandString); // Send the lock command as a string
+                Thread.Sleep(100); // Delay for command to be processed
+                var response = port.ReadLine(); // Read the response from the PSU
 
-                Task.Delay(500).Wait(); // Adjust delay if needed
+                // Convert the response string to a byte array
+                var responseBytes = Encoding.ASCII.GetBytes(response);
+
+                // Compare the byte arrays
+                if (responseBytes.SequenceEqual(lockCommand))
+                {
+                    return true; // Lock successful
+                }
+                else
+                {
+                    return false; // Lock failed
+                }
             }
             catch (Exception ex)
             {
-                // Log the exception details for debugging
-                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+                Console.WriteLine($"Error sending lock command: {ex.Message}");
+                return false;
             }
             finally
             {
-                port.Close();
+                // Close the serial port
+                if (port.IsOpen) { port.Close(); }
             }
-
-            isLocked = true;
-            return isLocked;
         }
     }
+
 
     public bool UnLockPsu()
     {
-        byte[] unlockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 };
+        var com = GetComport();
+        byte[] unlockCommand = { 0xF2, 0x00, 0x36, 0x10, 0x10, 0x02, 0x47 }; // Create the unlock command byte array
 
-        using (SerialPort port = new SerialPort(GetComport(), 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
             try
             {
-                port.Open();
-                port.Write(unlockCommand, 0, unlockCommand.Length);
+                port.Open(); // Open the serial port
+                var unlockCommandString = Encoding.ASCII.GetString(unlockCommand); // Convert the byte array to a string
+                port.Write(unlockCommandString); // Send the unlock command as a string
+                Thread.Sleep(100); // Delay for command to be processed
+                var response = port.ReadLine(); // Read the response from the PSU
 
-                Task.Delay(500).Wait(); // Adjust delay if needed
+                // Convert the response string to a byte array
+                var responseBytes = Encoding.ASCII.GetBytes(response);
+
+                // Compare the byte arrays
+                if (responseBytes.SequenceEqual(unlockCommand))
+                {
+                    return true; // Unlock successful
+                }
+                else
+                {
+                    return false; // Unlock failed
+                }
             }
             catch (Exception ex)
             {
-                // Log the exception details for debugging
-                Console.WriteLine($"Error communicating with the serial port: {ex.Message}");
+                Console.WriteLine($"Error sending unlock command: {ex.Message}");
+                return false;
             }
             finally
             {
-                port.Close();
+                // Close the serial port
+                if (port.IsOpen) { port.Close(); }
             }
-
-            isLocked = false;
-            return !isLocked;
         }
     }
-    
+
+
+
 
 
 
