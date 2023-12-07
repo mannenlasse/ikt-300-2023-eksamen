@@ -11,7 +11,7 @@ namespace UserInterface;
 public partial class Form1 : Form
 {
     private IPsu _psu;
-    private MyMqtt _mqttClient = new MyMqtt(); 
+    private MyMqtt _mqttClient = new MyMqtt();
     private ComboBox _comboBoxPsuTypes;
 
     public Form1()

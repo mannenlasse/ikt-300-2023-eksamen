@@ -19,7 +19,7 @@ public static class PsuFactory
             case PsuType.Dummy:
                 return new Dummy();
             case PsuType.Psu2000:
-                return new Psu2000();
+                return new Psu2000("temp");
             case PsuType.Psu3000:
                 return new Psu3000();
             default:
@@ -43,9 +43,99 @@ public interface IPsu
 
 public class Psu2000 : IPsu
 {
-    public Psu2000()
+    public string ComPort { get; private set; }
+    
+    public Psu2000(string comPort)
     {
+        ComPort = comPort;
         ActivateRemoteControl();
+    }
+    
+    public void Test()
+    {
+        var availablePorts = SerialPort.GetPortNames();
+        var validPorts = new List<string>();
+        var portsName = new List<string>();
+        
+        foreach (var comPort in availablePorts)
+        {
+            // Here we check if the response matches the valid response, for getting the serial number
+            // Telegram structure:
+            // Byte 0 = SD, Byte 1 = DN, Byte 2 = OBJ, Byte 3+x = DATA, Last two bytes = CS
+            //
+            // Check 1: Did the response timeout?
+            // Check 2: Is the response larger than 0?
+            // Check 3: Since we know serial number is OBJ=0 in the list, we can check if byte 2 is 0x00
+            // Check 4: The response must include SD, DN, OBJ, DATA and CS, meaning at least 1+1+1+2+1=6 in size
+            
+            byte[] bytesToSend = { 0x7F, 0x00, 0x00, 0x00, 0x7F };
+            var port = new SerialPort(comPort, 115200, 0, 8, StopBits.One);
+            port.ReadTimeout = 2000; // Sets a timeout for our port.Read()
+            
+            Thread.Sleep(500);
+            port.Open();
+            // write to the USB port
+            port.Write(bytesToSend, 0, bytesToSend.Length);
+            Thread.Sleep(500);
+
+            var deviceResponse = new List<byte>();
+            var length = port.BytesToRead;
+            
+            if (length > 6)
+            {
+                byte[] message = new byte[length];
+
+                try
+                {
+                    port.Read(message, 0, length);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // Check 1 or some other error
+                    port.Close();
+                    break;
+                }
+                
+                foreach (var t in message)
+                {
+                    deviceResponse.Add(t);
+                }
+            }
+            else
+            {
+                // Check 2 and Check 4
+                port.Close();
+                break;
+            }
+            port.Close();
+            Thread.Sleep(500);
+
+            if (deviceResponse[2] != 0x00)
+            {
+                // Check 3
+                break;
+            }
+            
+            // If we reached here, we passed all the checks and can add the comport to the list of valid comports
+            validPorts.Add(comPort);
+            
+            string binary = Convert.ToString(deviceResponse[0], 2);
+            string payloadLengtBinaryString = binary.Substring(4);
+            int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
+
+            string deviceName = "";
+            for (var i = 0; i < payloadLength; i++)
+            {
+                deviceName += Convert.ToChar(deviceResponse[3 + i]);
+            }
+            portsName.Add(deviceName);
+        }
+
+        for (var i = 0; i < validPorts.Count; i++)
+        {
+            Console.WriteLine(validPorts[i] + ": " + portsName[i]);
+        }
     }
     
     public void SetVoltage(float setVolt)
