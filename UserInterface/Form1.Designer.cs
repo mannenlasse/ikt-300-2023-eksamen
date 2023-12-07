@@ -102,7 +102,7 @@ namespace UserInterface
             button1.Name = "button1";
             button1.Size = new Size(839, 221);
             button1.TabIndex = 19;
-            button1.Text = "Power On/Off";
+            button1.Text = "Turn Remote off \r\n(Unlock)";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
@@ -207,7 +207,7 @@ namespace UserInterface
             // button6
             // 
             button6.Location = new Point(988, 482);
-            button6.Margin = new Padding(6, 6, 6, 6);
+            button6.Margin = new Padding(6);
             button6.Name = "button6";
             button6.Size = new Size(404, 154);
             button6.TabIndex = 37;
@@ -219,7 +219,7 @@ namespace UserInterface
             // 
             comboBox2.FormattingEnabled = true;
             comboBox2.Location = new Point(261, -2);
-            comboBox2.Margin = new Padding(2, 2, 2, 2);
+            comboBox2.Margin = new Padding(2);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(427, 49);
             comboBox2.TabIndex = 38;
@@ -228,7 +228,7 @@ namespace UserInterface
             // textBox2
             // 
             textBox2.Location = new Point(17, 0);
-            textBox2.Margin = new Padding(2, 2, 2, 2);
+            textBox2.Margin = new Padding(2);
             textBox2.Name = "textBox2";
             textBox2.ReadOnly = true;
             textBox2.Size = new Size(238, 47);
@@ -239,7 +239,7 @@ namespace UserInterface
             // button7
             // 
             button7.Location = new Point(17, 586);
-            button7.Margin = new Padding(6, 6, 6, 6);
+            button7.Margin = new Padding(6);
             button7.Name = "button7";
             button7.Size = new Size(244, 55);
             button7.TabIndex = 40;
@@ -250,7 +250,7 @@ namespace UserInterface
             // button3
             // 
             button3.Location = new Point(23, 666);
-            button3.Margin = new Padding(6, 6, 6, 6);
+            button3.Margin = new Padding(6);
             button3.Name = "button3";
             button3.Size = new Size(236, 66);
             button3.TabIndex = 41;
@@ -261,7 +261,7 @@ namespace UserInterface
             // button8
             // 
             button8.Location = new Point(13, 517);
-            button8.Margin = new Padding(6, 6, 6, 6);
+            button8.Margin = new Padding(6);
             button8.Name = "button8";
             button8.Size = new Size(249, 57);
             button8.TabIndex = 42;
@@ -272,7 +272,7 @@ namespace UserInterface
             // textBox3
             // 
             textBox3.Location = new Point(274, 517);
-            textBox3.Margin = new Padding(6, 6, 6, 6);
+            textBox3.Margin = new Padding(6);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(261, 47);
             textBox3.TabIndex = 43;
@@ -281,7 +281,7 @@ namespace UserInterface
             // textBox6
             // 
             textBox6.Location = new Point(274, 586);
-            textBox6.Margin = new Padding(6, 6, 6, 6);
+            textBox6.Margin = new Padding(6);
             textBox6.Name = "textBox6";
             textBox6.Size = new Size(261, 47);
             textBox6.TabIndex = 44;
@@ -290,7 +290,7 @@ namespace UserInterface
             // textBox7
             // 
             textBox7.Location = new Point(274, 672);
-            textBox7.Margin = new Padding(6, 6, 6, 6);
+            textBox7.Margin = new Padding(6);
             textBox7.Name = "textBox7";
             textBox7.Size = new Size(261, 47);
             textBox7.TabIndex = 45;

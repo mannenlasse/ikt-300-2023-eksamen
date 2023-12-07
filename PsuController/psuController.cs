@@ -47,6 +47,7 @@ public class Psu2000 : IPsu
 {
     public Psu2000()
     {
+        ActivateRemoteControl();
     }
     
     public void SetVoltage(float setVolt)
@@ -491,7 +492,7 @@ public class Psu2000 : IPsu
     {
         var com = GetComport();
 
-        var bytesToSendToTurnOffRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn off remote control
+        var bytesToSendToTurnOffRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x00, 0x01, 0x37 }; // Turn off remote control
         using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);

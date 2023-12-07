@@ -11,7 +11,7 @@ namespace UserInterface;
 public partial class Form1 : Form
 {
     private IPsu _psu;
-    private MyMqtt _mqttClient = new MyMqtt(); 
+    private MyMqtt _mqttClient = new MyMqtt();
     private ComboBox _comboBoxPsuTypes;
     private bool isRemoteControlOn = true;
 
@@ -91,10 +91,28 @@ public partial class Form1 : Form
 
         richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
-    
-    
-    
-    
+
+
+
+    private void RemoteOnOf()
+    {
+        if (isRemoteControlOn)
+        {
+            _psu.DeactivateRemoteControl();
+            button1.Text = "Turn Remote on" + "\n (Lock)";
+            isRemoteControlOn = false;
+        }
+        else
+        {
+            _psu.ActivateRemoteControl();
+            button1.Text = "Turn Remote off" + "\n (Unlock)";
+            isRemoteControlOn = true;
+        }
+        richTextBox2.AppendText("Remote is turned " + (isRemoteControlOn ? "On" : "Off") + "\n");
+    }
+
+
+
 
     // ... Other UI event handlers and methods ...
 
@@ -120,29 +138,29 @@ public partial class Form1 : Form
 
     string m_PSUID;
     string message;
-    
-    
-    
+
+
+
     private void button8_Click(object sender, EventArgs e)
     {
         //connect
         _mqttClient.connectClient();
     }
 
-    
+
     private void button3_Click(object sender, EventArgs e)
     {
         //subscribe_button
         _mqttClient.Subscribe(string.Format(textBox7.Text));
     }
-    
-    
-    
+
+
+
     private void button7_Click(object sender, EventArgs e)
     {
         //publish_button
         _mqttClient.publish(string.Format(textBox7.Text), string.Format(textBox6.Text));
-        
+
     }
 
 
@@ -168,19 +186,12 @@ public partial class Form1 : Form
     {
         //on_off button
     }
-    
+
     private void button1_Click(object sender, EventArgs e)
     {
-        if (isRemoteControlOn)
-        {
-            _psu.DeactivateRemoteControl();
-            isRemoteControlOn = false;
-        }
-        else
-        {
-            _psu.ActivateRemoteControl();
-            isRemoteControlOn = true;
-        }
+        button1.Text = "Remote is turned " + (isRemoteControlOn ? "On" : "Off") + "\n";
+
+        RemoteOnOf();
     }
 
 
