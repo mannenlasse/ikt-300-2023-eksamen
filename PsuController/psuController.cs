@@ -5,6 +5,7 @@ namespace PsuController;
 
 public enum PsuType
 {
+    //Arne anbefaler ikke enum cuz det er kode og 
     Psu2000,
     Psu3000,
     Dummy
