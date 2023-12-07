@@ -51,97 +51,8 @@ public class Psu2000 : IPsu
         ActivateRemoteControl();
     }
     
-    public void Test()
-    {
-        var availablePorts = SerialPort.GetPortNames();
-        var validPorts = new List<string>();
-        var portsName = new List<string>();
-        
-        foreach (var comPort in availablePorts)
-        {
-            // Here we check if the response matches the valid response, for getting the serial number
-            // Telegram structure:
-            // Byte 0 = SD, Byte 1 = DN, Byte 2 = OBJ, Byte 3+x = DATA, Last two bytes = CS
-            //
-            // Check 1: Did the response timeout?
-            // Check 2: Is the response larger than 0?
-            // Check 3: Since we know serial number is OBJ=0 in the list, we can check if byte 2 is 0x00
-            // Check 4: The response must include SD, DN, OBJ, DATA and CS, meaning at least 1+1+1+2+1=6 in size
-            
-            byte[] bytesToSend = { 0x7F, 0x00, 0x00, 0x00, 0x7F };
-            var port = new SerialPort(comPort, 115200, 0, 8, StopBits.One);
-            port.ReadTimeout = 2000; // Sets a timeout for our port.Read()
-            
-            Thread.Sleep(500);
-            port.Open();
-            // write to the USB port
-            port.Write(bytesToSend, 0, bytesToSend.Length);
-            Thread.Sleep(500);
-
-            var deviceResponse = new List<byte>();
-            var length = port.BytesToRead;
-            
-            if (length > 6)
-            {
-                byte[] message = new byte[length];
-
-                try
-                {
-                    port.Read(message, 0, length);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    // Check 1 or some other error
-                    port.Close();
-                    break;
-                }
-                
-                foreach (var t in message)
-                {
-                    deviceResponse.Add(t);
-                }
-            }
-            else
-            {
-                // Check 2 and Check 4
-                port.Close();
-                break;
-            }
-            port.Close();
-            Thread.Sleep(500);
-
-            if (deviceResponse[2] != 0x00)
-            {
-                // Check 3
-                break;
-            }
-            
-            // If we reached here, we passed all the checks and can add the comport to the list of valid comports
-            validPorts.Add(comPort);
-            
-            string binary = Convert.ToString(deviceResponse[0], 2);
-            string payloadLengtBinaryString = binary.Substring(4);
-            int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
-
-            string deviceName = "";
-            for (var i = 0; i < payloadLength; i++)
-            {
-                deviceName += Convert.ToChar(deviceResponse[3 + i]);
-            }
-            portsName.Add(deviceName);
-        }
-
-        for (var i = 0; i < validPorts.Count; i++)
-        {
-            Console.WriteLine(validPorts[i] + ": " + portsName[i]);
-        }
-    }
-    
     public void SetVoltage(float setVolt)
     {
-        var com = GetComport();
-        
         int percentSetValue = (int)Math.Round((25600 * setVolt) / 84);
 
         string hexValue = percentSetValue.ToString("X");
@@ -200,7 +111,7 @@ public class Psu2000 : IPsu
         }
 
         List<byte> newResponseTelegram;
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -236,8 +147,6 @@ public class Psu2000 : IPsu
     public string GetVoltage()
     {
         /* ----- First, we read the "wrong" voltage ----- */
-        var com = GetComport();
-        
         //SD = MessageType + CastType + Direction + Length
         var sdHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
         var sd = Convert.ToByte(sdHex.ToString(), 10);
@@ -280,7 +189,7 @@ public class Psu2000 : IPsu
 
         // now the byte array is ready to be sent
         List<byte> responseTelegram;
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -319,8 +228,6 @@ public class Psu2000 : IPsu
     public string GetCurrent()
     {
         /* ----- First, we read the "wrong" current ----- */
-        var com = GetComport();
-        
         //SD = MessageType + CastType + Direction + Length
         var sdHex = (int)0x40 + (int)0x20 + 0x10 + 5; //6-1 ref spec 3.1.1
         var sd = Convert.ToByte(sdHex.ToString(), 10);
@@ -363,7 +270,7 @@ public class Psu2000 : IPsu
 
         // now the byte array is ready to be sent
         List<byte> responseTelegram;
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -414,13 +321,12 @@ public class Psu2000 : IPsu
     // Custom methods
     public string GetSerialNumber()
     {
-        var com = GetComport();
         // reading serial number
         List<byte> serialresponse;
         // Remember the dataframe setup, SD, DN,   OBJ, DATA checksum1, checksum2
         // OBJ = 0x01 = 1
         byte[] serialBytesToSend = { 0x7F, 0x00, 0x01, 0x00, 0x80 };
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -481,11 +387,9 @@ public class Psu2000 : IPsu
     
     private double GetNominalVoltage()
     {
-        var com = GetComport();
-        
         List<byte> response;
         byte[] bytesToSend = { 0x74, 0x00, 0x02, 0x00, 0x76 };
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -512,11 +416,9 @@ public class Psu2000 : IPsu
 
     private double GetNominalCurrent()
     {
-        var com = GetComport();
-        
         List<byte> response;
         byte[] bytesToSend = { 0x74, 0x00, 0x03, 0x00, 0x77 };
-        using (var port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (var port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -543,10 +445,8 @@ public class Psu2000 : IPsu
     
     private void ActivateRemoteControl()
     {
-        var com = GetComport();
-        
         var bytesToSendToTurnOnRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn on remote control
-        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
         {
             Thread.Sleep(500);
             port.Open();
@@ -567,7 +467,7 @@ public class Psu2000 : IPsu
             Thread.Sleep(500);
             if (rcResponse[3] ==0)
             {
-                Console.WriteLine("Remote Control is turned on");
+                //Console.WriteLine("Remote Control is turned on");
             }
             else
             {

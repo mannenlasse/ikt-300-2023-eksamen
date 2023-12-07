@@ -5,7 +5,6 @@ namespace UserInterface;
 
 public class Program
 {
-    [STAThread]
     private static void Main(string[] args)
     {/*
         ApplicationConfiguration.Initialize();
@@ -14,9 +13,10 @@ public class Program
         var p = new Program();
         p.ProgramStart(formCool); */
         
-        ApplicationConfiguration.Initialize();
+        //ApplicationConfiguration.Initialize();
         var p = new Program();
-        var test = new PsuManager.PsuManager();
+        var psuManager = new PsuManager.PsuManager();
+        psuManager.StartRuntimeComportCheck(60000, 1000);
     }
 
     private void ProgramStart(Form1 form)
