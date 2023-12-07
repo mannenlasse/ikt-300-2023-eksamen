@@ -14,9 +14,9 @@ public partial class Form1 : Form
     private MyMqtt _mqttClient = new MyMqtt();
     private ComboBox _comboBoxPsuTypes;
     private bool isRemoteControlOn = true;
-    private bool isOperationRunning = false;
-    private Thread currentDisplayThread;
+    private bool isOperationStopped = false; 
     private int Xseconds;
+    
 
     public Form1()
     {
@@ -91,6 +91,7 @@ public partial class Form1 : Form
     // User-defined method to set voltage
    private void SetVolt()
     {
+        button5.Enabled = true;
         // This code allows for "." instead of ","
         var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
         ci.NumberFormat.CurrencyDecimalSeparator = ".";
@@ -102,11 +103,11 @@ public partial class Form1 : Form
         if (textBox18.Text.Length > 0)
         {
             Xseconds = int.Parse(textBox18.Text);
-
+            int currentXSeconds = Xseconds * 1000;
             // Start the current display thread with the existing X value in seconds
             Thread currentDisplayThread = new Thread(() =>
             {
-                DisplayCurrentLoop(Xseconds * 1000);
+                DisplayCurrentLoop(currentXSeconds);
             });
             currentDisplayThread.Start();
         }
@@ -126,13 +127,13 @@ public partial class Form1 : Form
    private void SetX()
    {
        Xseconds = int.Parse(textBox18.Text);
-       Xseconds *= 1000; // Convert input to seconds
+       int currentXSeconds = Xseconds * 1000;
 
        
        // Start a background thread to update the loop interval for the display
        Thread updateLoopIntervalThread = new Thread(() =>
        {
-           DisplayCurrentLoop(Xseconds);
+           DisplayCurrentLoop(currentXSeconds);
 
        });
        updateLoopIntervalThread.Start();
@@ -141,10 +142,9 @@ public partial class Form1 : Form
    private void DisplayCurrentLoop(int loopInterval)
    {
        Xseconds = loopInterval;
-
        var current = _psu.GetCurrent();
 
-       while (true)
+       while(!isOperationStopped)
        {
            textBox17.Text = current;
            richTextBox2.AppendText("\n Current: " + current + "A");
@@ -155,17 +155,20 @@ public partial class Form1 : Form
    
    private void StopOperation()
    {
-       // If the current display thread is running, wait for it to finish
-       if (currentDisplayThread != null && currentDisplayThread.IsAlive)
-       {
-           currentDisplayThread.Join();
-       }
-
-       // Set the voltage to 0
+       // Set voltage to 0
+       var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+       ci.NumberFormat.CurrencyDecimalSeparator = ".";
+        
        _psu.SetVoltage(0);
+
+       // Stop any ongoing operations, e.g., by setting isOperationStopped flag
+       isOperationStopped = true;
+
+       // Update UI accordingly
+       richTextBox2.AppendText("\n Operation Stopped");
        DisplayVoltageAndCurrent();
+       button5.Enabled = false;
    }
- 
 
     private void RemoteOnOf()
     {
