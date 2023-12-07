@@ -14,7 +14,7 @@ public partial class Form1 : Form
     private MyMqtt _mqttClient = new MyMqtt();
     private ComboBox _comboBoxPsuTypes;
     private bool isRemoteControlOn = true;
-
+    private int Xseconds;
 
     public Form1()
     {
@@ -66,7 +66,7 @@ public partial class Form1 : Form
     private void DisplayPsuInfo()
     {
         var currentVoltage = _psu.GetVoltage() + "V";
-        var currentCurrent = _psu.GetVoltage() + "A";
+        var currentCurrent = _psu.GetCurrent() + "A";
 
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
@@ -77,10 +77,12 @@ public partial class Form1 : Form
     public void DisplayVoltageAndCurrent()
     {
         var currentVoltage = _psu.GetVoltage() + "V";
-        var currentCurrent = _psu.GetVoltage() + "A";
+        var currentCurrent = _psu.GetCurrent() + "A";
 
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
+
+        richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
 
     // User-defined method to start displaying output
@@ -107,6 +109,7 @@ public partial class Form1 : Form
             _psu.ActivateRemoteControl();
             button1.Text = "Turn Remote off" + "\n (Unlock)";
             isRemoteControlOn = true;
+
         }
         richTextBox2.AppendText("Remote is turned " + (isRemoteControlOn ? "On" : "Off") + "\n");
     }
@@ -130,11 +133,40 @@ public partial class Form1 : Form
         var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
         ci.NumberFormat.CurrencyDecimalSeparator = ".";
 
+        
+        
         _psu.SetVoltage(float.Parse(textBox14.Text, NumberStyles.Any, ci));
-        DisplayVoltageAndCurrent();
+
+
+        var currentVoltage = _psu.GetVoltage() + "V";
+        
+
+        textBox13.Text = currentVoltage;
+
+        richTextBox2.Text = currentVoltage;
+
+
+        while (true)
+        {
+            
+            var currentCurrent = _psu.GetCurrent() + "A";
+            textBox17.Text = currentCurrent;
+            richTextBox2.Text = "\n" + currentCurrent;
+            
+            Thread.Sleep(Xseconds);
+        }
+
     }
 
-
+    
+    
+    
+    private void button5_Click(object sender, EventArgs e)
+    {
+        Xseconds = int.Parse(textBox18.Text);
+        Console.WriteLine(Xseconds);
+    }
+    
 
     string m_PSUID;
     string message;
@@ -163,7 +195,11 @@ public partial class Form1 : Form
 
     }
 
-
+    private void textBox18_TextChanged(object sender, EventArgs e)
+    {
+        //input for X seconds
+        
+    }
 
     private void textBox7_TextChanged(object sender, EventArgs e)
     {
@@ -184,12 +220,12 @@ public partial class Form1 : Form
 
     private void button6_Click(object sender, EventArgs e)
     {
-        //on_off button
+        //stop operation 
+
     }
 
     private void button1_Click(object sender, EventArgs e)
     {
-        button1.Text = "Remote is turned " + (isRemoteControlOn ? "On" : "Off") + "\n";
 
         RemoteOnOf();
     }
@@ -211,15 +247,14 @@ public partial class Form1 : Form
 
     }
 
-    private void button5_Click(object sender, EventArgs e)
-    {
 
-    }
 
     private void textBox14_TextChanged(object sender, EventArgs e)
     {
 
     }
+
+
 }
 
 
