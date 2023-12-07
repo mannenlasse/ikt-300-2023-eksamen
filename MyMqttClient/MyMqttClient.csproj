@@ -11,9 +11,4 @@
     <PackageReference Include="M2Mqtt" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\PsuController\PsuController.csproj" />
-    <ProjectReference Include="..\PsuManager\PsuManager.csproj" />
-  </ItemGroup>
-
 </Project>

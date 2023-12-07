@@ -215,14 +215,13 @@ public partial class Form1 : Form
     private void button8_Click(object sender, EventArgs e)
     {
         //connect
-        _mqttClient.connectClient();
+        
     }
 
 
     private void button3_Click(object sender, EventArgs e)
     {
         //subscribe_button
-        _mqttClient.Subscribe(string.Format(textBox7.Text));
     }
 
 
@@ -230,7 +229,6 @@ public partial class Form1 : Form
     private void button7_Click(object sender, EventArgs e)
     {
         //publish_button
-        _mqttClient.publish(string.Format(textBox7.Text), string.Format(textBox6.Text));
 
     }
 
