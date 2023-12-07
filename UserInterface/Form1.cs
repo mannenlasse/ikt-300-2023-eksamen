@@ -71,30 +71,88 @@ public partial class Form1 : Form
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
         textBox5.Text = _psu.GetSerialNumber();
+        
+        richTextBox2.AppendText("Remote is turned " + (isRemoteControlOn ? "On" : "Off") + "\n");
     }
 
     // User-defined method to display voltage
-    public void DisplayVoltageAndCurrent()
+    private void DisplayVoltageAndCurrent()
     {
         var currentVoltage = _psu.GetVoltage() + "V";
         var currentCurrent = _psu.GetCurrent() + "A";
 
         textBox13.Text = currentVoltage;
         textBox17.Text = currentCurrent;
-
-        richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
+    
 
-    // User-defined method to start displaying output
-    public void StartDisplayOutput()
+    // User-defined method to set voltage
+   private void SetVolt()
     {
-        var currentVoltage = "Current voltage: " + _psu.GetVoltage() + "V";
-        var currentCurrent = "Current current: " + _psu.GetCurrent() + "A";
+        // This code allows for "." instead of ","
+        var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+        ci.NumberFormat.CurrencyDecimalSeparator = ".";
+        
+        _psu.SetVoltage(float.Parse(textBox14.Text, NumberStyles.Any, ci));
+        DisplayVoltageAndCurrent();
+        
+        // Check for existing X value
+        if (textBox18.Text.Length > 0)
+        {
+            Xseconds = int.Parse(textBox18.Text);
 
-        richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
+            // Start the current display thread with the existing X value in seconds
+            Thread currentDisplayThread = new Thread(() =>
+            {
+                DisplayCurrentLoop(Xseconds * 1000);
+            });
+            currentDisplayThread.Start();
+        }
+        else
+        {
+            // Start the current display thread with default interval in seconds (3 seconds)
+            Thread currentDisplayThread = new Thread(() =>
+            {
+                DisplayCurrentLoop(5000);
+            });
+            currentDisplayThread.Start();
+        }
+        
     }
 
 
+   private void SetX()
+   {
+       Xseconds = int.Parse(textBox18.Text);
+       Xseconds *= 1000; // Convert input to seconds
+
+       
+       // Start a background thread to update the loop interval for the display
+       Thread updateLoopIntervalThread = new Thread(() =>
+       {
+           DisplayCurrentLoop(Xseconds);
+
+       });
+       updateLoopIntervalThread.Start();
+   }
+   
+   private void DisplayCurrentLoop(int loopInterval)
+   {
+       Xseconds = loopInterval;
+
+       var current = _psu.GetCurrent();
+
+       while (true)
+       {
+           textBox17.Text = current;
+           richTextBox2.AppendText("\n Current: " + current + "A");
+           Thread.Sleep(loopInterval);
+       }
+   }
+
+   
+   
+ 
 
     private void RemoteOnOf()
     {
@@ -118,61 +176,26 @@ public partial class Form1 : Form
 
 
     // ... Other UI event handlers and methods ...
-
-    // Example event handler for a button click
-    private void button2_Click(object sender, EventArgs e)
-    {
-        DisplayVoltageAndCurrent();
-        StartDisplayOutput();
-    }
-
+    
     // Example event handler for another button click
     private void button4_Click_1(object sender, EventArgs e)
     {
-        // This code allows for "." instead of ","
-        var ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
-        ci.NumberFormat.CurrencyDecimalSeparator = ".";
-
-        
-        
-        _psu.SetVoltage(float.Parse(textBox14.Text, NumberStyles.Any, ci));
-
-
-        var currentVoltage = _psu.GetVoltage() + "V";
-        
-
-        textBox13.Text = currentVoltage;
-
-        richTextBox2.Text = currentVoltage;
-
-
-        while (true)
-        {
-            
-            var currentCurrent = _psu.GetCurrent() + "A";
-            textBox17.Text = currentCurrent;
-            richTextBox2.Text = "\n" + currentCurrent;
-            
-            Thread.Sleep(Xseconds);
-        }
-
+        SetVolt();
     }
-
-    
     
     
     private void button5_Click(object sender, EventArgs e)
     {
-        Xseconds = int.Parse(textBox18.Text);
-        Console.WriteLine(Xseconds);
+       SetX();
     }
     
 
+    
+    
     string m_PSUID;
     string message;
 
-
-
+    
     private void button8_Click(object sender, EventArgs e)
     {
         //connect
