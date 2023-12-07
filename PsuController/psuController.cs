@@ -44,11 +44,13 @@ public interface IPsu
 public class Psu2000 : IPsu
 {
     public string ComPort { get; private set; }
+    public string SerialNumber { get; private set; }
     
     public Psu2000(string comPort)
     {
         ComPort = comPort;
         ActivateRemoteControl();
+        SerialNumber = GetSerialNumber();
     }
     
     public void SetVoltage(float setVolt)

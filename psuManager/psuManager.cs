@@ -7,56 +7,51 @@ using PsuController;
 using uPLibrary.Networking.M2Mqtt;
 using System.Management;
 using System.Timers;
+using UsbDiscovery;
 
 namespace PsuManager;
 
 public class PsuManager
 {
-    private Dictionary<string, IPsu> _psuControllerStore;
-    private PsuDiscoveryService _psuDiscovery;
+    private Dictionary<string, Psu2000?> _psuControllerStore;
     
-    public PsuManager()
+    public bool IsRunning { get; set; } = true;
+    
+    public PsuManager(ComPortDiscovery comPortDiscovery)
     {
-        _psuControllerStore = new Dictionary<string, IPsu>();
-        _psuDiscovery = new PsuDiscoveryService();
-        var Ps2000 = new PsuDiscoveryService.ComDeviceFilter { Pid = "a", Vid = "a" };
-        _psuDiscovery.ComDeviceFilterList.Add(Ps2000);
-        InitialDictionaryFill();
+        _psuControllerStore = new Dictionary<string, Psu2000?>();
         
-        _psuDiscovery.DeviceConnected += AddController;
-        _psuDiscovery.DeviceDisconnected += RemoveController;
+        //var ps2000 = new ComPortDiscovery.ComDeviceFilter { Pid = "0010", Vid = "232E" };
+        //_psuDiscovery.ComDeviceFilterList.Add(ps2000);
+        
+        comPortDiscovery.DeviceConnected += AddController;
+        comPortDiscovery.DeviceDisconnected += RemoveController;
     }
 
-    private void InitialDictionaryFill()
+    public async Task RunAsync()
     {
-        var dictionaryToAdd = _psuDiscovery.InitialComPortDiscover();
-
-        foreach (var psu in dictionaryToAdd)
+        while (IsRunning)
         {
-            _psuControllerStore.Add(psu.Key, psu.Value);
+            await Task.Delay(1000);
+            
+            // Console.WriteLine("Manager is running.");
         }
     }
 
     private void AddController(object sender, DeviceEventArgs e)
     {
-        var psuController = e.PsuController;
-        var psuSerialNumber = e.SerialNumber;
-
-        if (psuController == null)
-            return;
+        _psuControllerStore.Add(e.ComPort, null);
         
-        _psuControllerStore.Add(psuSerialNumber, psuController);
-        Console.WriteLine("Added: " + psuSerialNumber);
+        Console.WriteLine("Added controller on: " + e.ComPort);
     }
 
     private void RemoveController(object sender, DeviceEventArgs e)
     {
-        var psuSerialNumber = e.SerialNumber;
+        _psuControllerStore.Remove(e.ComPort);
         
-        _psuControllerStore.Remove(psuSerialNumber);
-        Console.WriteLine("Removed: " + psuSerialNumber);
+        Console.WriteLine("Removed controller on: " + e.ComPort);
     }
-    
+    /*
     public void StartRuntimeComportCheck(int totalRuntimeMs, int checkIntervalMs)
     {
         var timer = new System.Timers.Timer(checkIntervalMs);
@@ -76,6 +71,6 @@ public class PsuManager
     private void OnTimerElapsed(object sender, ElapsedEventArgs e)
     {
         Console.WriteLine("Searching...");
-        _psuDiscovery.RegularComPortCheck();
-    }
+        .RegularComPortCheck();
+    } */
 }
