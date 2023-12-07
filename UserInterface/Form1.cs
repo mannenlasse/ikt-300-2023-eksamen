@@ -13,6 +13,8 @@ public partial class Form1 : Form
     private IPsu _psu;
     private MyMqtt _mqttClient = new MyMqtt(); 
     private ComboBox _comboBoxPsuTypes;
+    private bool isRemoteControlOn = true;
+
 
     public Form1()
     {
@@ -89,6 +91,10 @@ public partial class Form1 : Form
 
         richTextBox2.Text = currentVoltage + "\n" + currentCurrent;
     }
+    
+    
+    
+    
 
     // ... Other UI event handlers and methods ...
 
@@ -161,6 +167,20 @@ public partial class Form1 : Form
     private void button6_Click(object sender, EventArgs e)
     {
         //on_off button
+    }
+    
+    private void button1_Click(object sender, EventArgs e)
+    {
+        if (isRemoteControlOn)
+        {
+            _psu.DeactivateRemoteControl();
+            isRemoteControlOn = false;
+        }
+        else
+        {
+            _psu.ActivateRemoteControl();
+            isRemoteControlOn = true;
+        }
     }
 
 

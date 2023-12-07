@@ -36,6 +36,8 @@ public interface IPsu
     public string GetCurrent();
     public void StopOperation();
     public void LockUnlock();
+    public void ActivateRemoteControl();
+    public void DeactivateRemoteControl();
     
     // Custom
     public string GetSerialNumber();
@@ -45,7 +47,6 @@ public class Psu2000 : IPsu
 {
     public Psu2000()
     {
-        ActivateRemoteControl();
     }
     
     public void SetVoltage(float setVolt)
@@ -451,7 +452,7 @@ public class Psu2000 : IPsu
         return BitConverter.ToSingle(byteArray, 0);
     }
     
-    private void ActivateRemoteControl()
+    public void ActivateRemoteControl()
     {
         var com = GetComport();
         
@@ -485,6 +486,41 @@ public class Psu2000 : IPsu
             }
         }
     }
+    
+    public void DeactivateRemoteControl()
+    {
+        var com = GetComport();
+
+        var bytesToSendToTurnOffRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x10, 0x01, 0x47 }; // Turn off remote control
+        using (SerialPort port = new SerialPort(com, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSendToTurnOffRc, 0, bytesToSendToTurnOffRc.Length);
+            Thread.Sleep(50);
+            var rcResponse = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    rcResponse.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+            if (rcResponse[3] == 0)
+            {
+                Console.WriteLine("Remote Control is turned off");
+            }
+            else
+            {
+                Console.WriteLine($"Remote control is not turned off due to error: {rcResponse[3].ToString()}");
+            }
+        }
+    }
 }
 
 internal class Psu3000 : IPsu
@@ -510,6 +546,16 @@ internal class Psu3000 : IPsu
     }
 
     public void LockUnlock()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public void DeactivateRemoteControl()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public void ActivateRemoteControl()
     {
         throw new NotImplementedException();
     }
@@ -554,6 +600,16 @@ internal class Dummy : IPsu
     }
 
     public string GetSerialNumber()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public void DeactivateRemoteControl()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public void ActivateRemoteControl()
     {
         throw new NotImplementedException();
     }
