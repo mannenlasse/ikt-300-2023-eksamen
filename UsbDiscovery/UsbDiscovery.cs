@@ -6,13 +6,19 @@ namespace UsbDiscovery;
 public class DeviceEventArgs : EventArgs
 {
     public string ComPort { get; }
-    public ComPortDiscovery.ComDeviceFilter ComFilter { get; }
+    public ComDeviceFilter ComFilter { get; }
 
-    public DeviceEventArgs(string comPort, ComPortDiscovery.ComDeviceFilter comFilter)
+    public DeviceEventArgs(string comPort, ComDeviceFilter comFilter)
     {
         ComPort = comPort;
         ComFilter = comFilter;
     }
+}
+
+public struct ComDeviceFilter
+{
+    public string Pid;
+    public string Vid;
 }
 
 public class ComPortDiscovery
@@ -20,25 +26,11 @@ public class ComPortDiscovery
     public event EventHandler<DeviceEventArgs> DeviceConnected;
     public event EventHandler<DeviceEventArgs> DeviceDisconnected;
 
-    public List<ComDeviceFilter> ComDeviceFilterList = new List<ComDeviceFilter>();
+    public List<ComDeviceFilter> ComDeviceFilterList = new();
 
-    private Dictionary<string, ComDeviceFilter> _currentComPorts = new Dictionary<string, ComDeviceFilter>();
+    private Dictionary<string, ComDeviceFilter> _currentComPorts = new();
 
-    public bool IsRunning { get; set; } = true;
-    
-    public async Task RunAsync()
-    {
-        while (IsRunning)
-        {
-            await Task.Delay(1000);
-            
-            RegularComPortCheck();
-            
-            // Console.WriteLine("Discovery is running.");
-        }
-    }
-    
-    private void RegularComPortCheck()
+    public void RegularComPortCheck()
     {
         var availablePorts = SerialPort.GetPortNames();
 
@@ -108,11 +100,5 @@ public class ComPortDiscovery
         }
 
         return null;
-    }
-    
-    public struct ComDeviceFilter
-    {
-        public string Pid;
-        public string Vid;
     }
 }

@@ -3,24 +3,17 @@ using System.Text.Json;
 
 namespace PsuController;
 
-public enum PsuType
-{
-    Psu2000,
-    Psu3000,
-    Dummy
-}
-
 public static class PsuFactory
 {
-    public static IPsu CreatePsu(PsuType psuType)
+    public static IPsu CreatePsu(string psuType, string comPort)
     {
-        switch (psuType)
+        switch (psuType.ToLower())
         {
-            case PsuType.Dummy:
+            case "dummy":
                 return new Dummy();
-            case PsuType.Psu2000:
-                return new Psu2000("temp");
-            case PsuType.Psu3000:
+            case "ps2000":
+                return new Psu2000(comPort);
+            case "ps3000":
                 return new Psu3000();
             default:
                 throw new ArgumentException("Unsupported PSU type: " + psuType);
@@ -35,7 +28,7 @@ public interface IPsu
     public string GetVoltage();
     public string GetCurrent();
     public void StopOperation();
-    public void LockUnlock();
+    public void LockUnlock(bool shouldLock);
     
     // Custom
     public string GetSerialNumber();
@@ -45,6 +38,8 @@ public class Psu2000 : IPsu
 {
     public string ComPort { get; private set; }
     public string SerialNumber { get; private set; }
+
+    private bool _isRemoteActivated;
     
     public Psu2000(string comPort)
     {
@@ -312,12 +307,21 @@ public class Psu2000 : IPsu
 
     public void StopOperation()
     {
-        throw new NotImplementedException();
+        SetVoltage(0f);
     }
 
-    public void LockUnlock()
+    public void LockUnlock(bool shouldLock)
     {
-        throw new NotImplementedException();
+        if (shouldLock)
+        {
+            if (shouldLock != _isRemoteActivated)
+                ActivateRemoteControl();
+        }
+        else
+        {
+            if (shouldLock != _isRemoteActivated)
+               DeactivateRemoteControl();
+        }
     }
 
     // Custom methods
@@ -367,24 +371,6 @@ public class Psu2000 : IPsu
 
             return serialNumberString;
         }
-    }
-    
-    private static string? GetComport()
-    {
-        // Read the entire JSON file content as a string
-        var jsonString = File.ReadAllText(@"./PsuController/comport.json");
-
-        // Use JsonDocument to parse the JSON string
-        var document = JsonDocument.Parse(jsonString);
-        
-        // Access the root object
-        var root = document.RootElement;
-
-        // Access the value of the "comport" property
-        var comportElement = root.GetProperty("comport");
-
-        // Convert the JsonElement to a C# string
-        return comportElement.GetString();
     }
     
     private double GetNominalVoltage()
@@ -476,6 +462,43 @@ public class Psu2000 : IPsu
                 Console.WriteLine($"Remote control is not turned on due to error: {rcResponse[3].ToString()}");
             }
         }
+
+        _isRemoteActivated = true;
+    }
+
+    private void DeactivateRemoteControl()
+    {
+        var bytesToSendToTurnOffRc = new byte[] { 0xF1, 0x00, 0x36, 0x10, 0x00, 0x01, 0x37 }; // Turn off remote control
+        using (SerialPort port = new SerialPort(ComPort, 115200, 0, 8, StopBits.One))
+        {
+            Thread.Sleep(500);
+            port.Open();
+            port.Write(bytesToSendToTurnOffRc, 0, bytesToSendToTurnOffRc.Length);
+            Thread.Sleep(50);
+            var rcResponse = new List<byte>();
+            var length = port.BytesToRead;
+            if (length > 0)
+            {
+                var message = new byte[length];
+                port.Read(message, 0, length);
+                foreach (var t in message)
+                {
+                    rcResponse.Add(t);
+                }
+            }
+            port.Close();
+            Thread.Sleep(500);
+            if (rcResponse[3] == 0)
+            {
+                Console.WriteLine("Remote Control is turned off");
+            }
+            else
+            {
+                Console.WriteLine($"Remote control is not turned off due to error: {rcResponse[3].ToString()}");
+            }
+        }
+
+        _isRemoteActivated = false;
     }
 }
 
@@ -501,7 +524,7 @@ internal class Psu3000 : IPsu
         throw new NotImplementedException();
     }
 
-    public void LockUnlock()
+    public void LockUnlock(bool shouldLock)
     {
         throw new NotImplementedException();
     }
@@ -540,7 +563,7 @@ internal class Dummy : IPsu
         throw new NotImplementedException();
     }
 
-    public void LockUnlock()
+    public void LockUnlock(bool shouldLock)
     {
         throw new NotImplementedException();
     }
