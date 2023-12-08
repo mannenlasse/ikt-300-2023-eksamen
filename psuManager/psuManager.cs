@@ -1,31 +1,31 @@
-using System.Diagnostics;
-using System.IO.Ports;
-using System.Text.Json;
-using MyMQTTClient;
-using uPLibrary.Networking.M2Mqtt.Messages;
 using PsuController;
-using uPLibrary.Networking.M2Mqtt;
-using System.Management;
-using System.Timers;
 using UsbDiscovery;
+using MyMqttClientWrapper;
 
 namespace PsuManager;
 
 public class PsuManager
 {
     private Dictionary<string, Psu2000?> _psuControllerStore;
+
+    private MyMqttClient _client; 
     
     public bool IsRunning { get; set; } = true;
     
     public PsuManager(ComPortDiscovery comPortDiscovery)
     {
         _psuControllerStore = new Dictionary<string, Psu2000?>();
+        _client = new MyMqttClient("localhost");
+        
+        _client.Publish("Psu/Psu2000/21717848381/GetVoltage", "24");
+        _client.Subscribe("Psu/Psu2000/21717848381/GetVoltage");
         
         //var ps2000 = new ComPortDiscovery.ComDeviceFilter { Pid = "0010", Vid = "232E" };
         //_psuDiscovery.ComDeviceFilterList.Add(ps2000);
         
         comPortDiscovery.DeviceConnected += AddController;
         comPortDiscovery.DeviceDisconnected += RemoveController;
+        _client.OnSubscribedTopicUpdated += TopicUpdateEventHandler;
     }
 
     public async Task RunAsync()
@@ -51,26 +51,9 @@ public class PsuManager
         
         Console.WriteLine("Removed controller on: " + e.ComPort);
     }
-    /*
-    public void StartRuntimeComportCheck(int totalRuntimeMs, int checkIntervalMs)
-    {
-        var timer = new System.Timers.Timer(checkIntervalMs);
-        timer.Elapsed += OnTimerElapsed;
-        timer.AutoReset = true;
 
-        Console.WriteLine("Started runtime...");
-        timer.Start();
-        Thread.Sleep(totalRuntimeMs);
-        timer.Stop();
-        timer.Dispose();
-        Console.WriteLine("Stopped runtime.");
-        
-        Console.WriteLine();
+    private void TopicUpdateEventHandler(object sender, MyMqttClient.TopicUpdate e)
+    {
+        Console.WriteLine(e.Topic + ": " + e.Message);
     }
-
-    private void OnTimerElapsed(object sender, ElapsedEventArgs e)
-    {
-        Console.WriteLine("Searching...");
-        .RegularComPortCheck();
-    } */
 }
