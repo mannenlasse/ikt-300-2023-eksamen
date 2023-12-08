@@ -59,12 +59,6 @@ namespace UserInterface
             button6 = new Button();
             comboBox2 = new ComboBox();
             textBox2 = new TextBox();
-            button7 = new Button();
-            button3 = new Button();
-            button8 = new Button();
-            textBox3 = new TextBox();
-            textBox6 = new TextBox();
-            textBox7 = new TextBox();
             SuspendLayout();
             // 
             // textBox4
@@ -234,71 +228,11 @@ namespace UserInterface
             textBox2.Text = "Select PSU Type";
             textBox2.TextChanged += textBox2_TextChanged;
             // 
-            // button7
-            // 
-            button7.Location = new Point(8, 286);
-            button7.Name = "button7";
-            button7.Size = new Size(115, 27);
-            button7.TabIndex = 40;
-            button7.Text = "publish";
-            button7.UseVisualStyleBackColor = true;
-            button7.Click += button7_Click;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(11, 325);
-            button3.Name = "button3";
-            button3.Size = new Size(111, 32);
-            button3.TabIndex = 41;
-            button3.Text = "subscribe";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
-            // 
-            // button8
-            // 
-            button8.Location = new Point(6, 252);
-            button8.Name = "button8";
-            button8.Size = new Size(117, 28);
-            button8.TabIndex = 42;
-            button8.Text = "connect";
-            button8.UseVisualStyleBackColor = true;
-            button8.Click += button8_Click;
-            // 
-            // textBox3
-            // 
-            textBox3.Location = new Point(129, 252);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(125, 27);
-            textBox3.TabIndex = 43;
-            textBox3.TextChanged += textBox3_TextChanged;
-            // 
-            // textBox6
-            // 
-            textBox6.Location = new Point(129, 286);
-            textBox6.Name = "textBox6";
-            textBox6.Size = new Size(125, 27);
-            textBox6.TabIndex = 44;
-            textBox6.TextChanged += textBox6_TextChanged;
-            // 
-            // textBox7
-            // 
-            textBox7.Location = new Point(129, 328);
-            textBox7.Name = "textBox7";
-            textBox7.Size = new Size(125, 27);
-            textBox7.TabIndex = 45;
-            textBox7.TextChanged += textBox7_TextChanged;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(874, 435);
-            Controls.Add(textBox7);
-            Controls.Add(textBox6);
-            Controls.Add(textBox3);
-            Controls.Add(button8);
-            Controls.Add(button3);
-            Controls.Add(button7);
             Controls.Add(textBox2);
             Controls.Add(comboBox2);
             Controls.Add(button6);
@@ -335,7 +269,6 @@ namespace UserInterface
         private TextBox textBox17;
         private TextBox textBox18;
         private Button button2;
-        private Button button3;
         private Splitter splitter1;
         private Button button4;
         private Button button5;
@@ -344,10 +277,5 @@ namespace UserInterface
         private Button button6;
         private ComboBox comboBox2;
         private TextBox textBox2;
-        private Button button7;
-        private Button button8;
-        private TextBox textBox3;
-        private TextBox textBox6;
-        private TextBox textBox7;
     }
 }
