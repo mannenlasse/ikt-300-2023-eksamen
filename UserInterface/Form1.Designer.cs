@@ -46,9 +46,9 @@ namespace UserInterface
             textBox5_view_current_serial_number = new TextBox();
             richTextBox2 = new RichTextBox();
             button1 = new Button();
-            textBox13_get_voltage = new TextBox();
+            textBox13_Get_Voltage = new TextBox();
             textBox14_set_voltage = new TextBox();
-            textBox17_get_current = new TextBox();
+            textBox17_getCurrent = new TextBox();
             textBox18_set_x = new TextBox();
             button2 = new Button();
             splitter1 = new Splitter();
@@ -57,7 +57,7 @@ namespace UserInterface
             button6 = new Button();
             comboBox2 = new ComboBox();
             textBox2 = new TextBox();
-            GetVoltage = new Button();
+            GetVoltageButton = new Button();
             GetCurrent = new Button();
             SuspendLayout();
             // 
@@ -99,13 +99,13 @@ namespace UserInterface
             button1.Text = "Power On/Off";
             button1.UseVisualStyleBackColor = true;
             // 
-            // textBox13_get_voltage
+            // textBox13_Get_Voltage
             // 
-            textBox13_get_voltage.Location = new Point(123, 69);
-            textBox13_get_voltage.Margin = new Padding(3, 4, 3, 4);
-            textBox13_get_voltage.Name = "textBox13_get_voltage";
-            textBox13_get_voltage.Size = new Size(203, 27);
-            textBox13_get_voltage.TabIndex = 22;
+            textBox13_Get_Voltage.Location = new Point(123, 69);
+            textBox13_Get_Voltage.Margin = new Padding(3, 4, 3, 4);
+            textBox13_Get_Voltage.Name = "textBox13_Get_Voltage";
+            textBox13_Get_Voltage.Size = new Size(203, 27);
+            textBox13_Get_Voltage.TabIndex = 22;
             // 
             // textBox14_set_voltage
             // 
@@ -116,13 +116,13 @@ namespace UserInterface
             textBox14_set_voltage.TabIndex = 23;
             textBox14_set_voltage.TextChanged += textBox14_TextChanged;
             // 
-            // textBox17_get_current
+            // textBox17_getCurrent
             // 
-            textBox17_get_current.Location = new Point(123, 100);
-            textBox17_get_current.Margin = new Padding(3, 4, 3, 4);
-            textBox17_get_current.Name = "textBox17_get_current";
-            textBox17_get_current.Size = new Size(203, 27);
-            textBox17_get_current.TabIndex = 26;
+            textBox17_getCurrent.Location = new Point(123, 100);
+            textBox17_getCurrent.Margin = new Padding(3, 4, 3, 4);
+            textBox17_getCurrent.Name = "textBox17_getCurrent";
+            textBox17_getCurrent.Size = new Size(203, 27);
+            textBox17_getCurrent.TabIndex = 26;
             // 
             // textBox18_set_x
             // 
@@ -205,15 +205,15 @@ namespace UserInterface
             textBox2.Text = "Select PSU Type";
             textBox2.TextChanged += textBox2_TextChanged;
             // 
-            // GetVoltage
+            // GetVoltageButton
             // 
-            GetVoltage.Location = new Point(9, 69);
-            GetVoltage.Name = "GetVoltage";
-            GetVoltage.Size = new Size(98, 29);
-            GetVoltage.TabIndex = 40;
-            GetVoltage.Text = "GetVoltage";
-            GetVoltage.UseVisualStyleBackColor = true;
-            GetVoltage.Click += GetVoltage_Click;
+            GetVoltageButton.Location = new Point(9, 69);
+            GetVoltageButton.Name = "GetVoltageButton";
+            GetVoltageButton.Size = new Size(98, 29);
+            GetVoltageButton.TabIndex = 40;
+            GetVoltageButton.Text = "GetVoltageButton";
+            GetVoltageButton.UseVisualStyleBackColor = true;
+            GetVoltageButton.Click += GetVoltage_Click;
             // 
             // GetCurrent
             // 
@@ -230,7 +230,7 @@ namespace UserInterface
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(874, 435);
             Controls.Add(GetCurrent);
-            Controls.Add(GetVoltage);
+            Controls.Add(GetVoltageButton);
             Controls.Add(textBox2);
             Controls.Add(comboBox2);
             Controls.Add(button6);
@@ -239,9 +239,9 @@ namespace UserInterface
             Controls.Add(splitter1);
             Controls.Add(button2);
             Controls.Add(textBox18_set_x);
-            Controls.Add(textBox17_get_current);
+            Controls.Add(textBox17_getCurrent);
             Controls.Add(textBox14_set_voltage);
-            Controls.Add(textBox13_get_voltage);
+            Controls.Add(textBox13_Get_Voltage);
             Controls.Add(button1);
             Controls.Add(richTextBox2);
             Controls.Add(textBox5_view_current_serial_number);
@@ -258,9 +258,9 @@ namespace UserInterface
         private TextBox textBox5_view_current_serial_number;
         private RichTextBox richTextBox2;
         private Button button1;
-        private TextBox textBox13_get_voltage;
+        private TextBox textBox13_Get_Voltage;
         private TextBox textBox14_set_voltage;
-        private TextBox textBox17_get_current;
+        private TextBox textBox17_getCurrent;
         private TextBox textBox18_set_x;
         private Button button2;
         private Splitter splitter1;
@@ -271,7 +271,7 @@ namespace UserInterface
         private Button button6;
         private ComboBox comboBox2;
         private TextBox textBox2;
-        private Button GetVoltage;
+        private Button GetVoltageButton;
         private Button GetCurrent;
     }
 }
