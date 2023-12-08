@@ -116,46 +116,6 @@ public partial class Form1 : Form
     string message;
     
     
-    
-    private void button8_Click(object sender, EventArgs e)
-    {
-        //connect
-        _mqttClient.connectClient();
-    }
-
-    
-    private void button3_Click(object sender, EventArgs e)
-    {
-        //subscribe_button
-        _mqttClient.Subscribe(string.Format(textBox7.Text));
-    }
-    
-    
-    
-    private void button7_Click(object sender, EventArgs e)
-    {
-        //publish_button
-        _mqttClient.publish(string.Format(textBox7.Text), string.Format(textBox6.Text));
-        
-    }
-
-
-
-    private void textBox7_TextChanged(object sender, EventArgs e)
-    {
-        //subscribe_textbox
-    }
-
-    private void textBox6_TextChanged(object sender, EventArgs e)
-    {
-        //publish_textox
-    }
-
-    private void textBox3_TextChanged(object sender, EventArgs e)
-    {
-        //connect_textbox
-    }
-
 
 
     private void button6_Click(object sender, EventArgs e)
